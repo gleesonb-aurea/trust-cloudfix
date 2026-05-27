@@ -1,0 +1,640 @@
+# CUR (Cost and Usage Report) Stack
+# This stack creates CUR on the management (or trial) account
+# This stack is being created by the parent CF stack https://cloudfix-templates.s3.amazonaws.com/cloudfix-onboarding.yaml
+# This file was influenced by the information on https://docs.aws.amazon.com/cur/latest/userguide/use-athena-cf.html
+AWSTemplateFormatVersion: '2010-09-09'
+Description: AWS CUR Report. Sets up CUR, Glue Crawler, Supporting Lambdas, Athena Workspace.
+Parameters:
+  ResourceSuffix:
+    Type: String
+    Default: ''
+    Description: CloudFormation resource suffix
+  DatabaseName:
+    Type: String
+    Default: 'cloudfixdb'
+    Description: Athena Database Name
+  Version:
+    Type: String
+    Description: Stack Version
+  CreationDate:
+    Description: Date
+    Type: String
+    Default: '2022-04-10'
+    AllowedPattern: "^\\d{4}(-\\d{2}){2}"
+    ConstraintDescription: Date and time of creation
+Resources:
+  # S3 bucket to deliver CUR data from AWS CE
+  CostUsageBucket:
+    Type: 'AWS::S3::Bucket'
+    DeletionPolicy: Delete
+    Properties:
+      LifecycleConfiguration:
+        Rules:
+          - Id: Cloudfix-SIT
+            Status: Enabled
+            ExpirationInDays: 365
+            Transitions:
+              - TransitionInDays: 0
+                StorageClass: INTELLIGENT_TIERING
+            NoncurrentVersionTransitions:
+              - TransitionInDays: 0
+                StorageClass: INTELLIGENT_TIERING
+      BucketName: !Join
+        - ''
+        - - 'cloudfix-cur-'
+          - !Ref 'AWS::AccountId'
+          - !Ref ResourceSuffix
+      BucketEncryption:
+          ServerSideEncryptionConfiguration:
+            - ServerSideEncryptionByDefault:
+                SSEAlgorithm: AES256
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+  # Allowing AWS to write CUR data in S3 bucket created by CostUsageBucket resource
+  # Does not allow CloudFix AWS account to assume this role.
+  AWSWritesPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref CostUsageBucket
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: 'billingreports.amazonaws.com'
+            Action:
+              - s3:GetBucketAcl
+              - s3:GetBucketPolicy
+            Resource: !Join
+              - ''
+              - - 'arn:aws:s3:::'
+                - 'cloudfix-cur-'
+                - !Ref 'AWS::AccountId'
+                - !Ref ResourceSuffix
+            Condition:
+              StringEquals:
+                aws:SourceArn: !Sub 'arn:aws:cur:us-east-1:${AWS::AccountId}:definition/*'
+                aws:SourceAccount: !Ref 'AWS::AccountId'
+          - Effect: Allow
+            Principal:
+              Service: 'billingreports.amazonaws.com'
+            Action: s3:PutObject
+            Resource: !Join
+              - ''
+              - - 'arn:aws:s3:::'
+                - 'cloudfix-cur-'
+                - !Ref 'AWS::AccountId'
+                - !Ref ResourceSuffix
+                - '/*'
+            Condition:
+              StringEquals:
+                aws:SourceArn: !Sub 'arn:aws:cur:us-east-1:${AWS::AccountId}:definition/*'
+                aws:SourceAccount: !Ref 'AWS::AccountId'
+          - Effect: Deny
+            Principal: '*'
+            Action: "s3:*"
+            Resource: 
+              - !Join
+                - ''
+                - - 'arn:aws:s3:::'
+                  - 'cloudfix-cur-'
+                  - !Ref 'AWS::AccountId'
+                  - !Ref ResourceSuffix
+
+              - !Join
+                - ''
+                - - 'arn:aws:s3:::'
+                  - 'cloudfix-cur-'
+                  - !Ref 'AWS::AccountId'
+                  - !Ref ResourceSuffix
+                  - '/*'
+            Condition:
+              Bool:
+                aws:SecureTransport: false
+  # AWS CUR report definition to receive the CUR data from AWS into S3 bucket in Parquet format
+  CloudFixCostReport:
+    Type: AWS::CUR::ReportDefinition
+    DependsOn:
+      - AWSWritesPolicy
+    Properties:
+      ReportName: !Join
+        - ''
+        - - 'CloudFix-CUR'
+          - !Ref ResourceSuffix
+      TimeUnit: HOURLY
+      S3Prefix: cloudfix
+      Format: Parquet
+      Compression: Parquet
+      S3Bucket: !Ref CostUsageBucket
+      S3Region: us-east-1
+      AdditionalSchemaElements:
+        - RESOURCES
+      AdditionalArtifacts:
+        - ATHENA
+      ReportVersioning: OVERWRITE_REPORT
+      RefreshClosedReports: true
+  # Athena requires Workgroup to be specified in order to execute queries
+  # CloudFix creates its own workgroup and output location to differentiate with default workgroup used on the account
+  CloudFixAthenaWorkGroup:
+    Type: AWS::Athena::WorkGroup
+    Properties:
+      Name: !Join
+        - ''
+        - - 'CloudFixWorkspace'
+          - !Ref ResourceSuffix
+      Description: CloudFix Workspace
+      RecursiveDeleteOption: true
+      State: ENABLED
+      Tags:
+        - Key: 'cloudfix:fixerId'
+          Value: !Join
+            - ''
+            - - 'CloudFix Infrastructure'
+              - !Ref ResourceSuffix
+        - Key: 'cloudfix:originalResourceId'
+          Value: 'CUR Stack'
+        - Key: 'cloudfix:executionDate'
+          Value: !Ref CreationDate
+      WorkGroupConfiguration:
+        BytesScannedCutoffPerQuery: 1099511627776
+        EnforceWorkGroupConfiguration: false
+        PublishCloudWatchMetricsEnabled: false
+        RequesterPaysEnabled: true
+        ResultConfiguration:
+          OutputLocation: !Join
+            - ''
+            - - 's3://'
+              - 'cloudfix-cur-'
+              - !Ref 'AWS::AccountId'
+              - !Ref ResourceSuffix
+              - '/cloudfix/query-results/'
+  # CloudFormation can not delete S3 buckets if the bucket is not empty when CloudFormation template is deleted
+  # The custom resource empties the S3 bucket before CloudFormation tries to delete S3 bucket
+  # Following role is created to execute the lambda function to be able to delete the records in S3
+  cleanupBucketOnDeleteLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Path: "/"
+      Policies:
+        - PolicyName: 'cleanupBucketOnDeleteLambdaPolicy'
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:*
+                Resource: !Join
+                  - ''
+                  - - 'arn:aws:s3:::'
+                    - 'cloudfix-cur-'
+                    - !Ref 'AWS::AccountId'
+                    - !Ref ResourceSuffix
+              - Effect: Allow
+                Action:
+                  - s3:*
+                Resource: !Join
+                  - ''
+                  - - 'arn:aws:s3:::'
+                    - 'cloudfix-cur-'
+                    - !Ref 'AWS::AccountId'
+                    - !Ref ResourceSuffix
+                    - '/*'
+  # CloudFormation delete fails if the bucket is not empty
+  # Custom resource lambda function that deletes the records in S3 before deleting S3 bucket (Not to fail CloudFormation delete).
+  CleanUpBuckets:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Join
+        - ''
+        - - 'Clean_Up_Buckets'
+          - !Ref ResourceSuffix
+      Description: LambdaFunction of python3.8 to perform Clean Up Buckets.
+      Runtime: python3.8
+      Code:
+        ZipFile: |
+          #!/usr/bin/env python3
+          import boto3
+          import cfnresponse
+          def return_response_to_cf(event, context, status, reason):
+            if event and event.get('ResponseURL'):
+              cfnresponse.send(event, context, status, {}, reason=reason)
+          def lambda_handler(event, context):
+            try:
+                bucket = event['ResourceProperties']['BucketName']
+
+                if event['RequestType'] == 'Delete':
+                    s3 = boto3.resource('s3')
+                    bucket = s3.Bucket(bucket)
+                    for obj in bucket.objects.filter():
+                        s3.Object(bucket.name, obj.key).delete()
+
+                return_response_to_cf(event, context, cfnresponse.SUCCESS, "All checks passed")
+            except Exception as e:
+                print(e)
+                return_response_to_cf(event, context, cfnresponse.FAILED, str(e))
+      Handler: 'index.lambda_handler'
+      Timeout: 900
+      Role: !GetAtt cleanupBucketOnDeleteLambdaRole.Arn
+  # Custom resource definition that invokes CleanUpBuckets lambda function
+  cleanupBucketOnDelete:
+    Type: Custom::cleanupbucket
+    Properties:
+      ServiceToken: !GetAtt CleanUpBuckets.Arn
+      BucketName: !Join
+        - ''
+        - - 'cloudfix-cur-'
+          - !Ref 'AWS::AccountId'
+          - !Ref ResourceSuffix
+    DependsOn: CostUsageBucket
+  # Glue database definition in order to create Athena table from S3 parquet files
+  AWSCURDatabase:
+    Type: 'AWS::Glue::Database'
+    Properties:
+      DatabaseInput:
+        Name: !Ref DatabaseName
+      CatalogId: !Ref AWS::AccountId
+  # IAM role to allow AWS Glue service to create Athena table from S3
+  # Does not allow CloudFix AWS account to assume this role.
+  AWSCURCrawlerComponentFunction:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - glue.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      Path: /
+      Policies:
+        - PolicyName: AWSCURCrawlerGluePerms
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Action:
+                  - glue:*
+                Effect: Allow
+                Resource: 
+                  - !Join
+                    - ''
+                    - - 'arn:aws:glue:'
+                      - !Ref 'AWS::Region'
+                      - ':'
+                      - !Ref 'AWS::AccountId'
+                      - ':database/'
+                      - !Ref AWSCURDatabase
+                  - !Join
+                    - ''
+                    - - 'arn:aws:glue:'
+                      - !Ref 'AWS::Region'
+                      - ':'
+                      - !Ref 'AWS::AccountId'
+                      - ':table/'
+                      - !Ref AWSCURDatabase
+                      - '*'
+                  - !Join
+                    - ''
+                    - - 'arn:aws:glue:'
+                      - !Ref 'AWS::Region'
+                      - ':'
+                      - !Ref 'AWS::AccountId'
+                      - ':catalog'
+              - Action:
+                  - s3:ListBucket
+                  - s3:GetBucketAcl
+                  - s3:GetBucketLocation
+                Effect: Allow
+                Resource: 
+                  - !Join
+                    - ''
+                    - - 'arn:aws:s3:::'
+                      - 'cloudfix-cur-'
+                      - !Ref 'AWS::AccountId'
+                      - !Ref ResourceSuffix
+              - Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Effect: Allow
+                Resource: arn:aws:logs:*:*:/aws-glue/*
+        - PolicyName: AWSCURCrawlerComponentFunction
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 's3:GetObject'
+                  - 's3:PutObject'
+                Resource: !Join
+                  - ''
+                  - - 'arn:aws:s3:::'
+                    - 'cloudfix-cur-'
+                    - !Ref 'AWS::AccountId'
+                    - !Ref ResourceSuffix
+                    - '/cloudfix/CloudFix-CUR'
+                    - !Ref ResourceSuffix
+                    - '/CloudFix-CUR'
+                    - !Ref ResourceSuffix
+                    - '*'
+  # IAM role to allow AWS lambda starting Glue Crawler for CUR
+  # Does not allow CloudFix AWS account to assume this role.
+  AWSCURCrawlerLambdaExecutor:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Path: /
+      Policies:
+        - PolicyName: AWSCURCrawlerLambdaExecutor
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'glue:StartCrawler'
+                Resource: !Join
+                  - ''
+                  - - 'arn:aws:glue:'
+                    - !Ref 'AWS::Region'
+                    - ':'
+                    - !Ref 'AWS::AccountId'
+                    - ':crawler/AWSCURCrawler-CloudFix-CUR'
+                    - !Ref ResourceSuffix
+  # Glue grawler which syncs Athena table from CUR s3 bucket
+  AWSCURCrawler:
+    Type: 'AWS::Glue::Crawler'
+    Properties:
+      Name: !Join
+        - ''
+        - - 'AWSCURCrawler-CloudFix-CUR'
+          - !Ref ResourceSuffix
+      Description: A recurring crawler that keeps your CUR table in Athena up-to-date.
+      Role: !GetAtt AWSCURCrawlerComponentFunction.Arn
+      DatabaseName: !Ref AWSCURDatabase
+      Configuration: "{\"Version\":1.0,\"CrawlerOutput\":{\"Tables\":{\"AddOrUpdateBehavior\":\"MergeNewColumns\"}}}"
+      Targets:
+        S3Targets:
+          - Path: !Join
+              - ''
+              - - 's3://'
+                - 'cloudfix-cur-'
+                - !Ref 'AWS::AccountId'
+                - !Ref ResourceSuffix
+                - '/cloudfix/CloudFix-CUR'
+                - !Ref ResourceSuffix
+                - '/CloudFix-CUR'
+                - !Ref ResourceSuffix
+            Exclusions:
+              - '**.json'
+              - '**.yml'
+              - '**.sql'
+              - '**.csv'
+              - '**.gz'
+              - '**.zip'
+      SchemaChangePolicy:
+        UpdateBehavior: UPDATE_IN_DATABASE
+        DeleteBehavior: DELETE_FROM_DATABASE
+      Tags:
+        "cloudfix:fixerId": !Join
+            - ''
+            - - 'CloudFix Infrastructure'
+              - !Ref ResourceSuffix
+        "cloudfix:originalResourceId": 'CUR Stack'
+        "cloudfix:executionDate": !Ref CreationDate
+  # Lambda function to be called once when the stack is being installed to start Glue Crawler
+  AWSCURInitializer:
+    Type: 'AWS::Lambda::Function'
+    DependsOn: AWSCURCrawler
+    Properties:
+      Code:
+        ZipFile: >
+          const AWS = require('aws-sdk');
+          const response = require('./cfn-response');
+          exports.handler = function(event, context, callback) {
+            if (event.RequestType === 'Delete') {
+              response.send(event, context, response.SUCCESS);
+            } else {
+              const glue = new AWS.Glue();
+              glue.startCrawler({ Name: process.env.CUR_CRAWLER_NAME }, function(err, data) {
+                if (err) {
+                  const responseData = JSON.parse(this.httpResponse.body);
+                  if (responseData['__type'] == 'CrawlerRunningException') {
+                    callback(null, responseData.Message);
+                  } else {
+                    const responseString = JSON.stringify(responseData);
+                    if (event.ResponseURL) {
+                      response.send(event, context, response.FAILED,{ msg: responseString });
+                    } else {
+                      callback(responseString);
+                    }
+                  }
+                }
+                else {
+                  if (event.ResponseURL) {
+                    response.send(event, context, response.SUCCESS);
+                  } else {
+                    callback(null, response.SUCCESS);
+                  }
+                }
+              });
+            }
+          };
+      Handler: 'index.handler'
+      Timeout: 30
+      Runtime: nodejs16.x
+      ReservedConcurrentExecutions: 1
+      Role: !GetAtt AWSCURCrawlerLambdaExecutor.Arn
+      Environment:
+        Variables:
+          CUR_CRAWLER_NAME: !Join
+            - ''
+            - - 'AWSCURCrawler-CloudFix-CUR'
+              - !Ref ResourceSuffix
+  # Custom resource definition that calls AWSCURInitializer lambda function
+  AWSStartCURCrawler:
+    Type: 'Custom::AWSStartCURCrawler'
+    Properties:
+      ServiceToken: !GetAtt AWSCURInitializer.Arn
+  # Lambda permission to allow S3 bucket to invoke the lambda function (when new report is generated by AWS)
+  AWSS3CUREventLambdaPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: 'lambda:InvokeFunction'
+      FunctionName: !GetAtt AWSCURInitializer.Arn
+      Principal: 's3.amazonaws.com'
+      SourceAccount: !Ref AWS::AccountId
+      SourceArn: !Join
+        - ''
+        - - 'arn:aws:s3:::'
+          - 'cloudfix-cur-'
+          - !Ref 'AWS::AccountId'
+          - !Ref ResourceSuffix
+  # Allows lambda to write S3 bucket notification
+  # Does not allow CloudFix AWS account to assume this role.
+  AWSS3CURLambdaExecutor:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Path: /
+      Policies:
+        - PolicyName: AWSS3CURLambdaExecutor
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 's3:PutBucketNotification'
+                Resource: !Join
+                  - ''
+                  - - 'arn:aws:s3:::'
+                    - 'cloudfix-cur-'
+                    - !Ref 'AWS::AccountId'
+                    - !Ref ResourceSuffix
+              - Effect: Allow
+                Action:
+                  - 'ce:UpdateCostAllocationTagsStatus'
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - 'support:CreateCase'
+                Resource: '*'
+  # S3 notification to invoke AWSCURInitializer lambda function when there is a new file (CUR report)
+  AWSS3CURNotification:
+    Type: 'AWS::Lambda::Function'
+    DependsOn:
+      - AWSCURInitializer
+      - AWSS3CUREventLambdaPermission
+    Properties:
+      Code:
+        ZipFile: >
+          const AWS = require('aws-sdk');
+          const response = require('./cfn-response');
+          exports.handler = function(event, context, callback) {
+            const s3 = new AWS.S3();
+            const putConfigRequest = function(notificationConfiguration) {
+              return new Promise(function(resolve, reject) {
+                s3.putBucketNotificationConfiguration({
+                  Bucket: event.ResourceProperties.BucketName,
+                  NotificationConfiguration: notificationConfiguration
+                }, function(err, data) {
+                  if (err) reject({ msg: this.httpResponse.body.toString(), error: err, data: data });
+                  else resolve(data);
+                });
+              });
+            };
+            const newNotificationConfig = {};
+            if (event.RequestType !== 'Delete') {
+              newNotificationConfig.LambdaFunctionConfigurations = [{
+                Events: [ 's3:ObjectCreated:*' ],
+                LambdaFunctionArn: event.ResourceProperties.TargetLambdaArn || 'missing arn',
+                Filter: { Key: { FilterRules: [ { Name: 'prefix', Value: event.ResourceProperties.ReportKey } ] } }
+              }];
+            }
+            if (event.RequestType === 'Create') {
+              const support = new AWS.Support();
+              const params = {
+                communicationBody: 'We need recently created CUR report named CloudFix-CUR to contain the data from the last 3 calendar months. Could you backfill the data for CloudFix-CUR?',
+                subject: 'Backfill CUR data',
+                categoryCode: 'invoices-and-reports',
+                ccEmailAddresses: [],
+                serviceCode: 'billing',
+                severityCode: 'high'
+              };
+              support.createCase(params, function(err, data) {
+                if (err) console.log(err, err.stack); // an error occurred
+                else     console.log(data);           // successful response
+              });
+            }
+            putConfigRequest(newNotificationConfig).then(function(result) {
+              response.send(event, context, response.SUCCESS, result);
+              callback(null, result);
+            }).catch(function(error) {
+              response.send(event, context, response.FAILED, error);
+              console.log(error);
+              callback(error);
+            });
+          };
+      Handler: 'index.handler'
+      Timeout: 30
+      Runtime: nodejs16.x
+      ReservedConcurrentExecutions: 1
+      Role: !GetAtt AWSS3CURLambdaExecutor.Arn
+  # Custom resource to notify S3 CUR update
+  AWSPutS3CURNotification:
+    Type: 'Custom::AWSPutS3CURNotification'
+    Properties:
+      ServiceToken: !GetAtt AWSS3CURNotification.Arn
+      TargetLambdaArn: !GetAtt AWSCURInitializer.Arn
+      BucketName: !Join
+        - ''
+        - - 'cloudfix-cur-'
+          - !Ref 'AWS::AccountId'
+          - !Ref ResourceSuffix
+      ReportKey: !Join
+        - ''
+        - - 'cloudfix/CloudFix-CUR'
+          - !Ref ResourceSuffix
+          - '/CloudFix-CUR'
+          - !Ref ResourceSuffix
+  # Cost and Usage status table to reflect AWS CUR status
+  AWSCURReportStatusTable:
+    Type: 'AWS::Glue::Table'
+    DependsOn: AWSCURDatabase
+    Properties:
+      DatabaseName: !Ref DatabaseName
+      CatalogId: !Ref AWS::AccountId
+      TableInput:
+        Name: 'cost_and_usage_data_status'
+        TableType: 'EXTERNAL_TABLE'
+        StorageDescriptor:
+          Columns:
+            - Name: status
+              Type: 'string'
+          InputFormat: 'org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat'
+          OutputFormat: 'org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat'
+          SerdeInfo:
+            SerializationLibrary: 'org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe'
+          Location: !Join
+            - ''
+            - - 's3://'
+              - 'cloudfix-cur-'
+              - !Ref 'AWS::AccountId'
+              - !Ref ResourceSuffix
+              - 'cloudfix/CloudFix-CUR'
+              - !Ref ResourceSuffix
+              - '/CloudFix-CUR'
+              - !Ref ResourceSuffix
+              - '/cost_and_usage_data_status/'

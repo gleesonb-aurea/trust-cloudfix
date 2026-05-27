@@ -178,6 +178,40 @@
         </div>
       </div>
 
+      <!-- CloudFormation Templates -->
+      <div class="section" id="templates">
+        <h2>CloudFormation Templates</h2>
+        <p>All CloudFix infrastructure is deployed via CloudFormation. You can review the exact templates before deployment:</p>
+        <table style="width:100%;margin-top:16px;">
+          <thead>
+            <tr><th>Template</th><th>Purpose</th><th>Link</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Onboarding Stack</strong></td>
+              <td>Main org stack — deploys all resources and roles required by CloudFix</td>
+              <td><a href="documents/cloudfix-onboarding.yaml" target="_blank">cloudfix-onboarding.yaml</a></td>
+            </tr>
+            <tr>
+              <td><strong>CUR Stack</strong></td>
+              <td>Sets up Cost and Usage Report, Glue Crawler, Athena workspace</td>
+              <td><a href="documents/cloudfix-cur.yaml" target="_blank">cloudfix-cur.yaml</a></td>
+            </tr>
+            <tr>
+              <td><strong>CUR Role</strong></td>
+              <td>IAM role for CUR and Athena query execution</td>
+              <td><a href="documents/cloudfix-cur-role.yaml" target="_blank">cloudfix-cur-role.yaml</a></td>
+            </tr>
+            <tr>
+              <td><strong>Resource Account Roles</strong></td>
+              <td>Finder and fixer IAM roles deployed to resource accounts via StackSets</td>
+              <td><a href="documents/cloudfix-resource-account-roles.yaml" target="_blank">cloudfix-resource-account-roles.yaml</a></td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="text-sm text-muted" style="margin-top:12px;">Templates are also available at <code>cloudfix-templates.s3.amazonaws.com</code> — these are the same templates used during onboarding.</p>
+      </div>
+
       <!-- Infrastructure Security -->
       <div class="section" id="infrastructure">
         <h2>Infrastructure Security</h2>

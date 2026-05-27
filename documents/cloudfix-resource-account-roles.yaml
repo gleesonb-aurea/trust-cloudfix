@@ -1,0 +1,441 @@
+# CloudFix resource account IAM roles stack
+# This stack is responsible for creating IAM roles on the resource accounts (under OUs)
+# This stack is referenced by parent CF stack https://cloudfix-templates.s3.amazonaws.com/cloudfix-onboarding.yaml
+AWSTemplateFormatVersion: '2010-09-09'
+Parameters:
+  ExternalId:
+    Type: String
+    Description: ExternalId
+  TenantId:
+    Type: String
+    Description: TenantId
+  ManagementAccountId:
+    Type: String
+    Description: Management Account Id
+  CloudFixAccount:
+    Type: String
+    Description: CloudFix Account
+  CloudFixSnsTopicName:
+    Type: String
+    Description: CloudFix SNS Topic Name
+  ResourceSuffix:
+    Type: String
+    Default: ''
+    Description: CloudFormation resource suffix
+  Version:
+    Type: String
+    Description: Stack Version
+
+Resources:
+  # CloudFix finder role
+  # Read-only permissions in order to allow CloudFix to check the cost opportunities and do validations regarding the resources
+  # Allows CloudFix AWS account to assume this role.
+  cloudfixfinderrole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: 'sts:AssumeRole'
+            Condition:
+              StringEquals:
+                'sts:ExternalId': !Ref ExternalId
+            Effect: Allow
+            Principal:
+              AWS: [
+                !Join ['', ['arn:', !Ref 'AWS::Partition', ':iam::', !Ref CloudFixAccount, ':role/cloudfix-finder-role-assume', !Ref ResourceSuffix]],
+                !Join ['', ['arn:', !Ref 'AWS::Partition', ':iam::', !Ref CloudFixAccount, ':role/cloudfix-finder-cur-role-assume', !Ref ResourceSuffix]]
+              ]
+        Version: 2012-10-17
+      MaxSessionDuration: 14400
+      Policies:
+        - PolicyDocument:
+            Statement:
+              - Action:
+                  - 'cloudfront:GetCachePolicy'
+                  - 'cloudfront:GetDistributionConfig'
+                  - 'cloudtrail:DescribeTrails'
+                  - 'cloudtrail:GetEventSelectors'
+                  - 'cloudtrail:GetInsightSelectors'
+                  - 'cloudtrail:GetTrailStatus'
+                  - 'cloudtrail:ListTrails'
+                  - 'cloudtrail:LookupEvents'
+                  - 'cloudwatch:GetMetricData'
+                  - 'cloudwatch:GetMetricStatistics'
+                  - 'cloudwatch:ListMetrics'
+                  - 'compute-optimizer:GetEC2InstanceRecommendations'
+                  - 'compute-optimizer:GetEnrollmentStatus'
+                  - 'dms:DescribeReplicationInstances'
+                  - 'dms:DescribeReplicationTasks'
+                  - 'dms:ListTagsForResource'
+                  - 'dynamodb:DescribeTable'
+                  - 'ebs:ListChangedBlocks'
+                  - 'ebs:ListSnapshotBlocks'
+                  - 'ec2:CreateTags'
+                  - 'ec2:DeleteTags'
+                  - 'ec2:DescribeAddresses'
+                  - 'ec2:DescribeAddressesAttribute'
+                  - 'ec2:DescribeFastSnapshotRestores'
+                  - 'ec2:DescribeImages'
+                  - 'ec2:DescribeInstanceAttribute'
+                  - 'ec2:DescribeInstanceStatus'
+                  - 'ec2:DescribeInstanceTypes'
+                  - 'ec2:DescribeInstances'
+                  - 'ec2:DescribeNatGateWays'
+                  - 'ec2:DescribeNatGateways'
+                  - 'ec2:DescribeRegions'
+                  - 'ec2:DescribeRouteTables'
+                  - 'ec2:DescribeSnapshotAttribute'
+                  - 'ec2:DescribeSnapshots'
+                  - 'ec2:DescribeSubnets'
+                  - 'ec2:DescribeVolumes'
+                  - 'ec2:DescribeVpcAttribute'
+                  - 'ec2:DescribeVpcEndpoints'
+                  - 'ec2:DescribeVpcs'
+                  - 'ec2:GetLaunchTemplateData'
+                  - 'elasticache:DescribeCacheClusters'
+                  - 'elasticfilesystem:DescribeFileSystems'
+                  - 'elasticfilesystem:DescribeLifecycleConfiguration'
+                  - 'elasticloadbalancing:DescribeLoadBalancers'
+                  - 'es:DescribeDomain'
+                  - 'es:DescribeDomainChangeProgress'
+                  - 'es:DescribeDomains'
+                  - 'iam:GetInstanceProfile'
+                  - 'iam:ListAttachedRolePolicies'
+                  - 'iam:ListInstanceProfilesForRole'
+                  - 'kendra:DescribeDataSource'
+                  - 'kendra:DescribeIndex'
+                  - 'kendra:ListDataSources'
+                  - 'pricing:GetProducts'
+                  - 'quicksight:ListUsers'
+                  - 'quicksight:SearchAnalyses'
+                  - 'quicksight:SearchDashboards'
+                  - 'quicksight:SearchDataSets'
+                  - 'quicksight:SearchDataSources'
+                  - 'rds:DescribeDBClusters'
+                  - 'rds:DescribeDBInstances'
+                  - 'rds:DescribeOrderableDBInstanceOptions'
+                  - 'route53:ListHostedZones'
+                  - 'route53:ListResourceRecordSets'
+                  - 's3:GetLifecycleConfiguration'
+                  - 's3:ListAllMyBuckets'
+                  - 'ssm:ListAssociations'
+                  - 'tag:TagResource'
+                Effect: Allow
+                Resource: '*'
+            Version: 2012-10-17
+          PolicyName: core
+
+        - PolicyDocument:
+            Statement:
+              - Action:
+                  - 'iam:ListAccountAliases'
+                  - 'organizations:DescribeOrganization'
+                  - 'organizations:ListAccounts'
+                Effect: Allow
+                Resource: '*'
+            Version: 2012-10-17
+          PolicyName: organization-retrieval
+      RoleName: !Join
+        - ''
+        - - cloudfix-finder-role
+          - !Ref ResourceSuffix
+  # IAM role to be used by SSM service with the change requests.
+  # Does not allow CloudFix AWS account to assume this role.
+  cloudfixssmassumedrole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: 'sts:AssumeRole'
+            Effect: Allow
+            Principal:
+              Service: ssm.amazonaws.com
+              AWS: !Join
+                - ''
+                - - 'arn:'
+                  - !Ref 'AWS::Partition'
+                  - ':iam::'
+                  - !Ref 'AWS::AccountId'
+                  - ':root'
+          - Action: 'sts:AssumeRole'
+            Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+        Version: 2012-10-17
+      MaxSessionDuration: 14400
+      Policies:
+        - PolicyDocument:
+            Statement:
+              - Action: 'sts:AssumeRole'
+                Effect: Allow
+                Resource: !Join
+                  - ''
+                  - - 'arn:aws:iam::'
+                    - !Ref 'AWS::AccountId'
+                    - ':role/cloudfix-ssm-assumed-role'
+                    - !Ref ResourceSuffix
+              - Action: 'iam:PassRole'
+                Effect: Allow
+                Resource: !Join
+                  - ''
+                  - - 'arn:aws:iam::'
+                    - !Ref 'AWS::AccountId'
+                    - ':role/cloudfix-ssm-assumed-role'
+                    - !Ref ResourceSuffix
+            Version: 2012-10-17
+          PolicyName: s3-limited
+        - PolicyDocument:
+            Statement:
+              - Action: 'sts:AssumeRole'
+                Effect: Allow
+                Resource: !Join
+                  - ''
+                  - - 'arn:aws:iam::'
+                    - !Ref 'AWS::AccountId'
+                    - ':role/cloudfix-ssm-assumed-role'
+                    - !Ref ResourceSuffix
+
+            Version: 2012-10-17
+          PolicyName: core
+      RoleName: !Join
+        - ''
+        - - cloudfix-ssm-assumed-role
+          - !Ref ResourceSuffix
+  # IAM role to be able to list and approve AWS Change Templates/Requests
+  # Depending on the installation parameter CentralizedTemplateApproval, it allows/denies CloudFix AWS account to assume this role.
+  cloudfixfixerapproverrole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: 'sts:AssumeRole'
+            Effect: 'Allow'
+            Principal:
+              AWS: !Join
+                - ''
+                - - 'arn:'
+                  - !Ref 'AWS::Partition'
+                  - ':iam::'
+                  - !Ref 'AWS::AccountId'
+                  - ':root'
+
+        Version: 2012-10-17
+      RoleName: !Join
+        - ''
+        - - cloudfix-fixer-approver-role
+          - !Ref ResourceSuffix
+  # Approver IAM policy definition to be able to list and approve AWS Change Templates
+  cloudfixapproverrolepolicy:
+    Type: 'AWS::IAM::Policy'
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action:
+              - 'ssm:SendAutomationSignal'
+              - 'ssm:GetOpsItem'
+              - 'ssm:GetDocument'
+              - 'ssm:GetServiceSetting'
+              - 'ssm:ListDocuments'
+              - 'ssm:ListDocumentVersions'
+              - 'ssm:DescribeDocument'
+              - 'ssm:UpdateDocumentMetadata'
+            Effect: Allow
+            Resource: '*'
+        Version: 2012-10-17
+      PolicyName: !Join
+        - ''
+        - - cloudfix-approver-group-policy
+          - !Ref ResourceSuffix
+      Roles:
+        - !Join
+          - ''
+          - - cloudfix-fixer-approver-role
+            - !Ref ResourceSuffix
+    DependsOn:
+      - cloudfixfixerapproverrole
+  # CloudFix ssm update role
+  # SSM permissions to create SSM runbooks for the change requests
+  # SSM permissions to create Change requests
+  # After change requests are created, they are executed with cloudfixssmassumedrole IAM role
+  # Permissions to add tags on resources that are marked manually by user as fixed
+  # Allows CloudFix AWS account to assume this role.
+  cloudfixssmupdaterole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: 'sts:AssumeRole'
+            Condition:
+              StringEquals:
+                'sts:ExternalId': !Ref ExternalId
+            Effect: Allow
+            Principal:
+              AWS: [
+                !Join ['', ['arn:', !Ref 'AWS::Partition', ':iam::', !Ref CloudFixAccount, ':role/cloudfix-finder-role-assume', !Ref ResourceSuffix]],
+                !Join ['', ['arn:', !Ref 'AWS::Partition', ':iam::', !Ref CloudFixAccount, ':role/cloudfix-finder-cur-role-assume', !Ref ResourceSuffix]],
+                !Join ['', ['arn:', !Ref 'AWS::Partition', ':iam::', !Ref CloudFixAccount, ':role/cloudfix-monitor-role-assume', !Ref ResourceSuffix]]
+              ]
+        Version: 2012-10-17
+      MaxSessionDuration: 14400
+      Policies:
+        - PolicyDocument:
+            Statement:
+              - Action: 'iam:PassRole'
+                Effect: Allow
+                Resource: !GetAtt
+                  - cloudfixssmassumedrole
+                  - Arn
+              - Action:
+                  - 'ssm:CreateDocument'
+                  - 'ssm:GetDocument'
+                  - 'ssm:UpdateDocument'
+                  - 'ssm:UpdateDocumentMetadata'
+                  - 'ssm:DescribeDocument'
+                  - 'ssm:ListDocumentVersions'
+                  - 'ssm:StartChangeRequestExecution'
+                  - 'ssm:DeleteDocument'
+                  - 'ssm:ListDocuments'
+                  - 'ssm:UpdateDocumentDefaultVersion'
+                  - 'ssm:GetAutomationExecution'
+                  - 'ssm:GetOpsItem'
+                  - 'ssm:DescribeOpsItems'
+                  - 'ssm:ListOpsItemEvents'
+                  - 'ssm:UpdateOpsItem'
+                  - 'ssm:StartAutomationExecution'
+                  - 'ssm:StopAutomationExecution'
+                  - 'ssm:SendAutomationSignal'
+                  - 'ssm:DescribeAutomationStepExecutions'
+                  - 'ssm:DescribeAutomationExecutions'
+                  - 'ssm:AddTagsToResource'
+                  - 'iam:ListRoles'
+                  - 'iam:ListUsers'
+                  - 'iam:ListGroups'
+                  - 'iam:GetGroup'
+                  - 'iam:CreateServiceLinkedRole'
+                  - 'ssm:GetOpsSummary'
+                  - 'ssm:GetOpsMetadata'
+                  - 'sns:CreateTopic'
+                  - 'sns:ConfirmSubscription'
+                  - 'ssm:UpdateServiceSetting'
+                  - 'ssm:GetServiceSetting'
+                  - 'autoscaling:CreateOrUpdateTags'
+                  - 'backup:TagResource'
+                  - 'cloudfront:TagResource'
+                  - 'dlm:TagResource'
+                  - 'dynamodb:TagResource'
+                  - 'ec2:CreateTags'
+                  - 'elasticfilesystem:CreateTags'
+                  - 'rds:AddTagsToResource'
+                  - 'elasticfilesystem:TagResource'
+                  - 'es:AddTags'
+                  - 's3:PutBucketTagging'
+                  - 's3:GetObject'
+                  - 'tag:TagResources'
+                Effect: Allow
+                Resource: '*'
+            Version: 2012-10-17
+          PolicyName: core
+      RoleName: !Join
+        - ''
+        - - cloudfix-ssm-update-role
+          - !Ref ResourceSuffix
+  # CloudFix backup job role
+  # Permissions to allow AWS BackUp service to create the backups
+  # Does not allow CloudFix AWS account to assume this role.
+  cloudfixbackupjobrole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: 'sts:AssumeRole'
+            Effect: Allow
+            Principal:
+              Service: backup.amazonaws.com
+        Version: 2012-10-17
+      MaxSessionDuration: 14400
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSBackupServiceRolePolicyForBackup
+        - arn:aws:iam::aws:policy/service-role/AWSBackupServiceRolePolicyForRestores
+      Policies:
+        - PolicyDocument:
+            Statement:
+              - Action:
+                  - 'backup:DescribeBackupVault'
+                  - 'backup:CopyIntoBackupVault'
+                  - 'backup:CopyFromBackupVault'
+                  - 'elasticfilesystem:Backup'
+                  - 'elasticfilesystem:DescribeTags'
+                Effect: Allow
+                Resource: '*'
+              - Action:
+                  - 'ec2:CreateSnapshot'
+                  - 'ec2:DeleteSnapshot'
+                  - 'ec2:DescribeVolumes'
+                Effect: Allow
+                Resource:
+                  - 'arn:aws:ec2:*::snapshot/*'
+                  - 'arn:aws:ec2:*:*:volume/*'
+              - Action:
+                  - 'ec2:DescribeSnapshots'
+                  - 'ec2:DescribeTags'
+                Effect: Allow
+                Resource: '*'
+              - Action:
+                  - 'ec2:CopySnapshot'
+                  - 'ec2:CreateTags'
+                  - 'ec2:DeleteSnapshot'
+                Effect: Allow
+                Resource: 'arn:aws:ec2:*::snapshot/*'
+              - Action: 'ec2:ModifySnapshotAttribute'
+                Condition:
+                  'Null':
+                    'aws:ResourceTag/aws:backup:source-resource': 'false'
+                Effect: Allow
+                Resource: '*'
+            Version: 2012-10-17
+          PolicyName: core
+      RoleName: !Join
+        - ''
+        - - cloudfix-backup-job-role
+          - !Ref ResourceSuffix
+  # Custom resource notification that sends all the parameters on Properties to CloudFix AWS account using SNS
+  # CloudFix stores these information received from SNS
+  cloudfixresourceaccountnotifier:
+    Type: 'AWS::CloudFormation::CustomResource'
+    Properties:
+      ServiceToken: !Join
+        - ''
+        - - 'arn:'
+          - !Ref 'AWS::Partition'
+          - ':sns:'
+          - !Ref 'AWS::Region'
+          - ':'
+          - !Ref CloudFixAccount
+          - ':'
+          - !Ref CloudFixSnsTopicName
+      AccountId: !Ref 'AWS::AccountId'
+      StackName: !Ref 'AWS::StackName'
+      FinderRoleArn: !GetAtt
+        - cloudfixfinderrole
+        - Arn
+      MinimalRoleArn: !GetAtt
+        - cloudfixssmupdaterole
+        - Arn
+      IamPolicy: ''
+      TemplateApproverRoleArn: !GetAtt
+        - cloudfixfixerapproverrole
+        - Arn
+      RoleEnabled: 'true'
+      SsmRoleArn: !GetAtt
+        - cloudfixssmassumedrole
+        - Arn
+      BackupJobRole: !GetAtt
+        - cloudfixbackupjobrole
+        - Arn
+      ExternalId: !Ref ExternalId
+      TenantId: !Ref TenantId
+      Version: !Ref Version
+      StackRegion: !Ref 'AWS::Region'
+      ManagementAccountId: !Ref ManagementAccountId
+      ReadOnly: 'false'
+    UpdateReplacePolicy: Delete

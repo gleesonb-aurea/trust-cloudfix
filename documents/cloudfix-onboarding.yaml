@@ -1,0 +1,268 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: >-
+  Main Org stack - that deploys all resources and roles required by CloudFix.
+  All template updates should go through this stack.
+Parameters:
+  ExternalId:
+    Type: String
+    Description: ExternalId
+  TenantId:
+    Type: String
+    Description: TenantId
+  CreationDate:
+    Description: Date
+    Type: String
+    Default: 2022-04-10
+    AllowedPattern: ^\d{4}(-\d{2}){2}
+    ConstraintDescription: Date and time of creation
+  CloudFixCFBucketPrefix:
+    Type: String
+    Description: CloudFix CloudFormation Templates Bucket HTTPS prefix
+    Default: https://cloudfix-templates.s3.amazonaws.com/
+  IsTrial:
+    Type: String
+    AllowedValues:
+      - 'true'
+      - 'false'
+    Default: 'false'
+Mappings:
+  CloudFixDefinitions:
+    CloudFixAccount:
+      Default: '061081614506'
+    CloudFixSnsTopicName:
+      Default: cloudfix-stack-prod-cloudfixiamrolesprodBB1500ED-6MARQETT6Q9M
+    CloudFixOrgSnsTopicName:
+      Default: cloudfix-onboarding-listener-prod
+    ResourceSuffix:
+      Default: ''
+    DatabaseName:
+      Default: cloudfixdb
+    Version:
+      Default: '4.18'
+    CustomerVersion:
+      Default: '1'
+    CentralizedStackEnabled:
+      Default: 'false'
+Conditions:
+  OrganizationStackCondition: !Equals 
+    - !Ref IsTrial
+    - 'false'
+Resources:
+  OrgRoleStackSet:
+    Type: AWS::CloudFormation::StackSet
+    DependsOn:
+      - CURRoleStack
+    Condition: OrganizationStackCondition
+    DeletionPolicy: Delete
+    Properties:
+      StackSetName: !Join 
+        - ''
+        - - CloudFixOrgStackSet
+          - !FindInMap 
+            - CloudFixDefinitions
+            - ResourceSuffix
+            - Default
+      AutoDeployment:
+        Enabled: true
+        RetainStacksOnAccountRemoval: false
+      OperationPreferences:
+        FailureTolerancePercentage: 50
+        MaxConcurrentCount: 40
+      Description: CloudFix Org Finder/Fixer/Backup and Minimal SSM access roles.
+      PermissionModel: SERVICE_MANAGED
+      Capabilities:
+        - CAPABILITY_NAMED_IAM
+      ManagedExecution:
+        Active: true
+      TemplateURL: !Join 
+        - ''
+        - - !Ref CloudFixCFBucketPrefix
+          - !Ref TenantId
+          - /cloudfix-resource-account-roles.yaml
+      Parameters:
+        - ParameterKey: ExternalId
+          ParameterValue: !Ref ExternalId
+        - ParameterKey: TenantId
+          ParameterValue: !Ref TenantId
+        - ParameterKey: ManagementAccountId
+          ParameterValue: !Ref AWS::AccountId
+        - ParameterKey: CloudFixAccount
+          ParameterValue: !FindInMap 
+            - CloudFixDefinitions
+            - CloudFixAccount
+            - Default
+        - ParameterKey: CloudFixSnsTopicName
+          ParameterValue: !FindInMap 
+            - CloudFixDefinitions
+            - CloudFixSnsTopicName
+            - Default
+        - ParameterKey: ResourceSuffix
+          ParameterValue: !FindInMap 
+            - CloudFixDefinitions
+            - ResourceSuffix
+            - Default
+        - ParameterKey: Version
+          ParameterValue: !Join 
+            - ''
+            - - !FindInMap 
+                - CloudFixDefinitions
+                - Version
+                - Default
+              - .
+              - !FindInMap 
+                - CloudFixDefinitions
+                - CustomerVersion
+                - Default
+      Tags:
+        - Key: cloudfix:fixerId
+          Value: !Join 
+            - ''
+            - - CloudFix Infrastructure
+              - !FindInMap 
+                - CloudFixDefinitions
+                - ResourceSuffix
+                - Default
+        - Key: cloudfix:originalResourceId
+          Value: Role Stack
+        - Key: cloudfix:executionDate
+          Value: !Ref CreationDate
+  OrgRoleManagement:
+    Type: AWS::CloudFormation::Stack
+    DependsOn:
+      - CURRoleStack
+    Properties:
+      TemplateURL: !Join 
+        - ''
+        - - !Ref CloudFixCFBucketPrefix
+          - !Ref TenantId
+          - /cloudfix-resource-account-roles.yaml
+      Parameters:
+        ExternalId: !Ref ExternalId
+        TenantId: !Ref TenantId
+        ManagementAccountId: !Ref AWS::AccountId
+        CloudFixAccount: !FindInMap 
+          - CloudFixDefinitions
+          - CloudFixAccount
+          - Default
+        CloudFixSnsTopicName: !FindInMap 
+          - CloudFixDefinitions
+          - CloudFixSnsTopicName
+          - Default
+        ResourceSuffix: !FindInMap 
+          - CloudFixDefinitions
+          - ResourceSuffix
+          - Default
+        Version: !Join 
+          - ''
+          - - !FindInMap 
+              - CloudFixDefinitions
+              - Version
+              - Default
+            - .
+            - !FindInMap 
+              - CloudFixDefinitions
+              - CustomerVersion
+              - Default
+      Tags:
+        - Key: cloudfix:fixerId
+          Value: !Join 
+            - ''
+            - - CloudFix Infrastructure
+              - !FindInMap 
+                - CloudFixDefinitions
+                - ResourceSuffix
+                - Default
+        - Key: cloudfix:originalResourceId
+          Value: Role Stack
+        - Key: cloudfix:executionDate
+          Value: !Ref CreationDate
+  CURStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Join 
+        - ''
+        - - !Ref CloudFixCFBucketPrefix
+          - cloudfix-cur.yaml
+      Parameters:
+        ResourceSuffix: !FindInMap 
+          - CloudFixDefinitions
+          - ResourceSuffix
+          - Default
+        DatabaseName: !FindInMap 
+          - CloudFixDefinitions
+          - DatabaseName
+          - Default
+        Version: !FindInMap 
+          - CloudFixDefinitions
+          - Version
+          - Default
+        CreationDate: !Ref CreationDate
+      Tags:
+        - Key: cloudfix:fixerId
+          Value: !Join 
+            - ''
+            - - CloudFix Infrastructure
+              - !FindInMap 
+                - CloudFixDefinitions
+                - ResourceSuffix
+                - Default
+        - Key: cloudfix:originalResourceId
+          Value: CUR Stack
+        - Key: cloudfix:executionDate
+          Value: !Ref CreationDate
+  CURRoleStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Join 
+        - ''
+        - - !Ref CloudFixCFBucketPrefix
+          - cloudfix-cur-role.yaml
+      Parameters:
+        ExternalId: !Ref ExternalId
+        CloudFixAccount: !FindInMap 
+          - CloudFixDefinitions
+          - CloudFixAccount
+          - Default
+        CloudFixSnsTopicName: !FindInMap 
+          - CloudFixDefinitions
+          - CloudFixOrgSnsTopicName
+          - Default
+        TenantId: !Ref TenantId
+        IsTrial: !Ref IsTrial
+        ResourceSuffix: !FindInMap 
+          - CloudFixDefinitions
+          - ResourceSuffix
+          - Default
+        DatabaseName: !FindInMap 
+          - CloudFixDefinitions
+          - DatabaseName
+          - Default
+        MainStackName: !Ref AWS::StackName
+        CentralizedStackEnabled: !FindInMap 
+          - CloudFixDefinitions
+          - CentralizedStackEnabled
+          - Default
+        Version: !Join 
+          - ''
+          - - !FindInMap 
+              - CloudFixDefinitions
+              - Version
+              - Default
+            - .
+            - !FindInMap 
+              - CloudFixDefinitions
+              - CustomerVersion
+              - Default
+      Tags:
+        - Key: cloudfix:fixerId
+          Value: !Join 
+            - ''
+            - - CloudFix Infrastructure
+              - !FindInMap 
+                - CloudFixDefinitions
+                - ResourceSuffix
+                - Default
+        - Key: cloudfix:originalResourceId
+          Value: CUR Stack
+        - Key: cloudfix:executionDate
+          Value: !Ref CreationDate
