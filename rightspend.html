@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RightSpend — CloudFix Trust Center</title>
+  <meta name="description" content="RightSpend security architecture, onboarding, IAM permissions, and account transfer process.">
+  <link rel="icon" type="image/png" href="assets/cloudfix-logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- Mobile Header -->
+<div class="mobile-header">
+  <div class="brand-row">
+    <img src="assets/cloudfix-logo.png" alt="CloudFix" class="logo-img">
+  </div>
+  <button class="hamburger" id="hamburger" aria-label="Open menu">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+  </button>
+</div>
+<div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+<!-- Sidebar -->
+<nav class="sidebar">
+  <div class="sidebar-brand">
+    <img src="assets/cloudfix-logo.png" alt="CloudFix" class="logo-img">
+    <div class="brand-sub">Trust Center</div>
+  </div>
+  <div class="sidebar-nav">
+    <a href="index.html">Overview</a>
+    <a href="security.html">Security</a>
+    <a href="privacy.html">Privacy</a>
+    <a href="compliance.html">Compliance</a>
+    <a href="data-processing.html">Data Processing</a>
+    <a href="rightspend.html" class="active">RightSpend</a>
+    <a href="status.html">Status</a>
+    <a href="contact.html">Contact</a>
+  </div>
+</nav>
+
+<!-- Main Content -->
+<main class="main-content">
+  <div class="page-wrapper">
+
+      <!-- Page Header -->
+      <div class="section">
+        <h1>RightSpend</h1>
+        <p class="lead">Commitment-free EC2 cost optimization. How RightSpend works, what permissions it needs, and how accounts are managed.</p>
+      </div>
+
+      <!-- How It Works -->
+      <div class="section">
+        <h2>How RightSpend Works</h2>
+        <p>RightSpend maximizes the Effective Savings Rate (ESR) of AWS EC2 Compute costs by dynamically optimizing <strong>Convertible Reserved Instances (cRIs)</strong>. It achieves discounts equivalent to 3-year all-upfront Compute Savings Plans — without the commitment or upfront cash outlay.</p>
+        <div class="card-grid" style="margin-top:16px;">
+          <div class="card">
+            <h3 style="margin-top:0;color:var(--cf-blue);">Read-Only Monitoring</h3>
+            <p>Continuously monitors EC2 usage, Savings Plans, and Reserved Instances across every account in your AWS Organization.</p>
+          </div>
+          <div class="card">
+            <h3 style="margin-top:0;color:var(--cf-blue);">Dynamic cRI Optimization</h3>
+            <p>Purchases, modifies, and exchanges Convertible Reserved Instances hourly to match actual compute usage. No forecasting required.</p>
+          </div>
+          <div class="card">
+            <h3 style="margin-top:0;color:var(--cf-blue);">Zero Commitment</h3>
+            <p>If your usage decreases, commitments scale down accordingly. No overcommitment risk, no unused reservations, no upfront payment.</p>
+          </div>
+        </div>
+        <div class="callout" style="margin-top:20px;">
+          <strong>What RightSpend does NOT do:</strong> We never have write access to EC2 instances or any AWS resources other than Reserved Instances and Convertible Reserved Instances in designated cRI accounts. We do not move accounts between organizations, buy or sell RIs on the marketplace, or require changes to your existing Savings Plans.
+        </div>
+      </div>
+
+      <!-- IAM Permissions -->
+      <div class="section">
+        <h2>IAM Permissions</h2>
+        <p>RightSpend uses three distinct IAM roles, each following the principle of least privilege. Each role is deployed only where it's needed.</p>
+
+        <div class="card" style="margin-top:16px;">
+          <h3 style="margin-top:0;">1. ReadOnly Role — All Member Accounts</h3>
+          <p><code>CloudFix-RightSpend-ReadOnly-Role</code> — deployed to every account in your Organization.</p>
+          <p><strong>Permissions:</strong></p>
+          <ul>
+            <li><code>ec2:DescribeInstances</code> — point-in-time running instance count</li>
+            <li><code>ec2:DescribeCapacityReservations</code> / <code>ec2:GetCapacityReservationUsage</code></li>
+            <li><code>ec2:DescribeHosts</code> — dedicated host monitoring</li>
+            <li><code>ec2:DescribeReservedInstances</code> — existing RI inventory</li>
+            <li><code>ec2:DescribeRegions</code></li>
+            <li><code>savingsplans:DescribeSavingsPlans</code></li>
+          </ul>
+          <p class="text-sm text-muted">Only <strong>Describe</strong> and <strong>List</strong> actions. No write access to any resources.</p>
+        </div>
+
+        <div class="card" style="margin-top:12px;">
+          <h3 style="margin-top:0;">2. ReadOnly Master Role — Management Account Only</h3>
+          <p><code>CloudFix-RightSpend-ReadOnly-Master-Role</code> — deployed only to your AWS management (payer) account.</p>
+          <p><strong>Permissions:</strong></p>
+          <ul>
+            <li><code>organizations:ListAccounts</code> / <code>organizations:ListRoots</code> — enumerate all Org accounts</li>
+            <li><code>ce:GetCostAndUsage</code> — aggregate billing data</li>
+            <li><code>ce:GetReservationCoverage</code> / <code>ce:GetReservationUtilization</code></li>
+            <li><code>ce:GetSavingsPlansCoverage</code> / <code>ce:GetSavingsPlansUtilization</code></li>
+            <li><code>ce:GetSavingsPlansPurchaseRecommendation</code></li>
+            <li><code>cloudformation:CreateStackInstances</code> / <code>cloudformation:ListStackSetOperations</code> — auto-deploy ReadOnly role to member accounts (limited to CloudFix-RightSpend stacks only)</li>
+          </ul>
+        </div>
+
+        <div class="card" style="margin-top:12px;">
+          <h3 style="margin-top:0;">3. Write Role — cRI Accounts Only</h3>
+          <p><code>CloudFix-RightSpend-Write-Role</code> — deployed <strong>only</strong> to the designated account(s) used for managing Convertible Reserved Instances.</p>
+          <p><strong>Permissions:</strong></p>
+          <ul>
+            <li><code>ec2:DescribeReservedInstances</code></li>
+            <li><code>ec2:AcceptReservedInstancesExchangeQuote</code></li>
+            <li><code>ec2:GetReservedInstancesExchangeQuote</code></li>
+            <li><code>ec2:PurchaseReservedInstancesOffering</code></li>
+            <li><code>ec2:ModifyReservedInstances</code></li>
+            <li><code>ec2:DescribeReservedInstancesOfferings</code></li>
+            <li><code>ec2:DescribeReservedInstancesModifications</code></li>
+            <li><code>ec2:DescribeReservedInstancesListings</code></li>
+            <li><code>organizations:DescribeOrganization</code></li>
+          </ul>
+          <div class="callout">
+            <strong>Limited to cRI operations only.</strong> This role cannot touch EC2 instances, S3 buckets, VPCs, databases, or any other AWS resource. It can only purchase, modify, and exchange Convertible Reserved Instances.
+          </div>
+        </div>
+      </div>
+
+      <!-- CloudFormation Templates -->
+      <div class="section">
+        <h2>CloudFormation Templates</h2>
+        <p>All roles are deployed via CloudFormation. You can review the templates before deployment:</p>
+        <table style="width:100%;margin-top:12px;">
+          <thead>
+            <tr>
+              <th>Template</th>
+              <th>Deploys To</th>
+              <th>Link</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>ReadOnly Master</td>
+              <td>Management account</td>
+              <td><code>s3.amazonaws.com/.../ReadOnly-Master.yaml</code></td>
+            </tr>
+            <tr>
+              <td>ReadOnly Member</td>
+              <td>All member accounts</td>
+              <td><code>s3.amazonaws.com/.../ReadOnly.yaml</code></td>
+            </tr>
+            <tr>
+              <td>Write Role</td>
+              <td>cRI accounts only</td>
+              <td><code>s3.amazonaws.com/.../Write.yaml</code></td>
+            </tr>
+            <tr>
+              <td>Master (No Auto-Deploy)</td>
+              <td>Management account</td>
+              <td><code>s3.amazonaws.com/.../ReadOnly-Master-NoCreateInstances.yaml</code></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Onboarding -->
+      <div class="section">
+        <h2>Onboarding Process</h2>
+        <div style="margin-top:16px;">
+          <div style="display:flex;gap:12px;align-items:flex-start;margin-bottom:16px;">
+            <div style="min-width:36px;height:36px;border-radius:50%;background:var(--cf-blue);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600;">1</div>
+            <div>
+              <strong>Enable Hourly Granularity</strong>
+              <p class="text-sm">In your AWS management account, enable hourly Cost Explorer data under Billing and Cost Management → Cost Management Preferences.</p>
+            </div>
+          </div>
+          <div style="display:flex;gap:12px;align-items:flex-start;margin-bottom:16px;">
+            <div style="min-width:36px;height:36px;border-radius:50%;background:var(--cf-blue);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600;">2</div>
+            <div>
+              <strong>Install READ Permissions</strong>
+              <p class="text-sm">Deploy the ReadOnly Master CloudFormation stack in your management account. This automatically deploys the ReadOnly role to all member accounts via StackSets.</p>
+            </div>
+          </div>
+          <div style="display:flex;gap:12px;align-items:flex-start;margin-bottom:16px;">
+            <div style="min-width:36px;height:36px;border-radius:50%;background:var(--cf-blue);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600;">3</div>
+            <div>
+              <strong>Invite cRI Account</strong>
+              <p class="text-sm">Send an invitation from your management account to the RightSpend cRI account. CloudFix accepts the invitation and deploys the Write role.</p>
+            </div>
+          </div>
+          <div style="display:flex;gap:12px;align-items:flex-start;margin-bottom:16px;">
+            <div style="min-width:36px;height:36px;border-radius:50%;background:var(--cf-blue);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600;">4</div>
+            <div>
+              <strong>Dry-Run (Optional)</strong>
+              <p class="text-sm">Preview the commitment allocation produced by the algorithm before activating live optimization.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Account Transfer -->
+      <div class="section">
+        <h2>Account Transfer Process</h2>
+        <p>When a customer transitions to managing their own cRI accounts, the following transfer process is used:</p>
+        <div style="margin-top:12px;">
+          <div style="display:flex;gap:12px;align-items:flex-start;margin-bottom:12px;">
+            <div style="min-width:28px;height:28px;border-radius:50%;background:#e2e8f0;color:var(--cf-dark);display:flex;align-items:center;justify-content:center;font-weight:600;font-size:14px;">1</div>
+            <div>
+              <strong>Customer sends invitation</strong> from their management account to the cRI account being transferred.
+            </div>
+          </div>
+          <div style="display:flex;gap:12px;align-items:flex-start;margin-bottom:12px;">
+            <div style="min-width:28px;height:28px;border-radius:50%;background:#e2e8f0;color:var(--cf-dark);display:flex;align-items:center;justify-content:center;font-weight:600;font-size:14px;">2</div>
+            <div>
+              <strong>CloudFix handles:</strong> Accepts the invitation, checks tax settings (removes TRN if not inherited from master payer), and deploys the RightSpend Write role.
+            </div>
+          </div>
+          <div style="display:flex;gap:12px;align-items:flex-start;margin-bottom:12px;">
+            <div style="min-width:28px;height:28px;border-radius:50%;background:#e2e8f0;color:var(--cf-dark);display:flex;align-items:center;justify-content:center;font-weight:600;font-size:14px;">3</div>
+            <div>
+              <strong>Customer updates root email</strong> (optional) — see <a href="https://repost.aws/knowledge-center/organizations-change-member-email" target="_blank" rel="noopener">AWS guide</a>.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Billing -->
+      <div class="section">
+        <h2>Billing &amp; Terms</h2>
+        <div class="card-grid" style="margin-top:16px;">
+          <div class="card">
+            <h3 style="margin-top:0;">AWS Marketplace</h3>
+            <p>RightSpend is available through <strong>AWS Marketplace</strong> as a SaaS subscription. Customers subscribe directly through AWS and charges appear on the AWS bill. EDP-eligible.</p>
+          </div>
+          <div class="card">
+            <h3 style="margin-top:0;">Pricing Model</h3>
+            <p><strong>Share of net new savings.</strong> If RightSpend doesn't save you money, you don't pay. Typical subscription rates range from 18-25% of realized savings.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- API Impact -->
+      <div class="section">
+        <h2>API Impact</h2>
+        <p>RightSpend calls <code>ec2.DescribeInstances</code> approximately once per hour per account. AWS rate limits for this API are 10 requests/second. RightSpend's usage represents <strong>0.0028%</strong> of the rate limit — effectively negligible.</p>
+      </div>
+
+      <div class="section" style="border-top:1px solid var(--cf-border);padding-top:20px;">
+        <p class="text-sm text-muted">Questions about RightSpend security or onboarding? <a href="contact.html">Contact us</a> | <a href="https://support.cloudfix.com" target="_blank" rel="noopener">Support docs</a></p>
+      </div>
+
+  </div>
+</main>
+
+<script src="js/main.js"></script>
+</body>
+</html>
