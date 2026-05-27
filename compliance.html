@@ -292,6 +292,9 @@
             <option value="soc2-type2">SOC 2 Type 2 Report</option>
             <option value="soc2-type2">SOC 2 Type 2 Report</option>
             <option value="dpa">Data Processing Addendum (DPA)</option>
+            <option value="tos">Terms of Service</option>
+            <option value="privacy">Privacy Policy</option>
+            <option value="rightspend">RightSpend Information</option>
             <option value="penetration-test">Penetration Test Summary</option>
             <option value="other">Other</option>
           </select>
@@ -300,9 +303,44 @@
           <label for="req-message">Additional details</label>
           <textarea id="req-message" name="message" rows="3"></textarea>
         </div>
-        <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;">Submit Request</button>
+        <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;" id="req-submit-btn">Submit Request</button>
+          <p id="req-form-status" style="margin-top:8px;text-align:center;display:none;"></p>
       </form>
-    </div>
+    
+          <script>
+          (function(){
+            var form = document.getElementById("request-access-form");
+            if(!form) return;
+            form.addEventListener("submit", function(e){
+              e.preventDefault();
+              var btn = document.getElementById("req-submit-btn");
+              var st = document.getElementById("req-form-status");
+              btn.disabled = true; btn.textContent = "Submitting...";
+              fetch("https://automate.billgleeson.com/webhook/trust-center-contact", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({
+                  name: document.getElementById("req-name").value,
+                  email: document.getElementById("req-email").value,
+                  company: document.getElementById("req-company").value,
+                  subject: "Doc Request: " + (document.getElementById("req-need").value || "General"),
+                  message: document.getElementById("req-message").value || "(No additional details)"
+                })
+              }).then(function(r){
+                if(r.ok){
+                  st.style.display="block"; st.style.color="#059669";
+                  st.textContent="✓ Request submitted. We will respond within 2 business days.";
+                  form.reset();
+                } else { throw new Error("err"); }
+              }).catch(function(){
+                st.style.display="block"; st.style.color="#dc2626";
+                st.textContent="Failed to submit. Please try the contact page.";
+              });
+              btn.disabled = false; btn.textContent = "Submit Request";
+            });
+          })();
+          </script>
+  </div>
   </div>
 </div>
 </div>
