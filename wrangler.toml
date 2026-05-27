@@ -1,0 +1,8 @@
+name = "trust-cloudfix"
+compatibility_date = "2024-01-01"
+
+[site]
+bucket = "."
+
+[routes]
+pattern = "trust-cloudfix.gleesonb.workers.dev/*"
