@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Security — CloudFix Trust Center</title>
+  <meta name="description" content="CloudFix security architecture, permission model, and infrastructure details.">
+  <link rel="icon" type="image/png" href="assets/cloudfix-logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- Mobile Header -->
+<div class="mobile-header">
+  <div class="brand-row">
+    <img src="assets/cloudfix-logo.png" alt="CloudFix" class="logo-img">
+  </button>
+</div>
+<div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+<div class="layout">
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <img src="assets/cloudfix-logo.png" alt="CloudFix" class="logo-img">
+      <div class="brand-sub">Trust Center</div>
+    </div>
+    <div class="sidebar-nav">
+      <a href="security.html" class="active"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Security</a>
+      <a href="privacy.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>Privacy</a>
+      <a href="compliance.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>Compliance</a>
+      <a href="data-processing.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Data Processing</a>
+      <a href="status.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Status</a>
+      <a href="contact.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>Contact</a>
+    <div class="sidebar-footer">
+      <a href="https://cloudfix.com" target="_blank" rel="noopener">← Back to cloudfix.com</a>
+    </div>
+  </nav>
+
+  <main class="main-content">
+    <div class="page-wrapper">
+
+      <div class="page-header">
+        <h1>Security</h1>
+        <p class="subtitle">How CloudFix protects your AWS environment and data.</p>
+        <p class="last-updated" data-last-updated></p>
+      </div>
+
+      <!-- Finder-Fixer Lifecycle -->
+      <div class="section" id="lifecycle">
+        <h2>Finder-Fixer Lifecycle</h2>
+        <p>CloudFix uses a secure four-step lifecycle to analyze and optimize your AWS infrastructure. At every stage, you maintain full control over your data and changes.</p>
+
+        <div class="lifecycle-steps" style="margin-top:24px;">
+          <div class="lifecycle-step">
+            <div class="step-number">1</div>
+            <div class="step-content">
+              <h4>Connect via CloudFormation StackSet</h4>
+              <p>You connect your AWS account to CloudFix through a CloudFormation StackSet provided by CloudFix. This creates carefully scoped IAM roles with only the permissions needed for analysis and approved optimizations.</p>
+            </div>
+          </div>
+          <div class="lifecycle-step">
+            <div class="step-number">2</div>
+            <div class="step-content">
+              <h4>Metadata Collection (Read-Only)</h4>
+              <p>The Finder role collects resource metadata using standard AWS tools — AWS Cost and Usage Reports (CUR), CloudWatch metrics, and read-only instance metadata. No application data or content is accessed. Only <strong>Describe, List, and Get</strong> actions are performed.</p>
+            </div>
+          </div>
+          <div class="lifecycle-step">
+            <div class="step-number">3</div>
+            <div class="step-content">
+              <h4>Optimization Recommendations</h4>
+              <p>75+ automated finders analyze the collected metadata to identify cost savings opportunities. Recommendations appear in your CloudFix dashboard with estimated savings, effort, and risk for each finding.</p>
+            </div>
+          </div>
+          <div class="lifecycle-step">
+            <div class="step-number">4</div>
+            <div class="step-content">
+              <h4>Approved Execution via SSM Automation</h4>
+              <p>When you approve a fix, CloudFix executes it through central automation runbooks in AWS SSM Automation. You must explicitly approve the runbook before any changes are made. Changes are executed by a role on <strong>your account</strong> that CloudFix creates but <strong>cannot itself assume or access</strong>.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="callout callout-success" style="margin-top:16px;">
+          <strong>No changes to core services (EC2, Volumes, S3) are made unless a central automation runbook is approved by you.</strong> The fixer role is created by CloudFix but <strong>cannot be assumed or accessed by CloudFix</strong> — you retain full control.
+        </div>
+      </div>
+
+      <!-- IAM Role Structure -->
+      <div class="section" id="iam-roles">
+        <h2>IAM Role Architecture</h2>
+        <p>CloudFix creates a set of minimally-scoped IAM roles in your AWS account. Each role follows the principle of least privilege and is limited to specific service areas.</p>
+
+        <h3>Core Functionality Roles</h3>
+        <div class="card" style="margin:12px 0 20px;">
+          <p><strong>cloudfix-athena-query-execution-role</strong> — Queries AWS Cost and Usage Reports via Amazon Athena. Manages AWS Organizations data and CloudFormation stack operations. This role processes billing data, not infrastructure data.</p>
+        </div>
+
+        <h3>Finder Role (Read-Only)</h3>
+        <div class="card" style="margin:12px 0 20px;">
+          <p><strong>cloudfix-finder-role</strong> — Discovers optimization opportunities across your AWS services. This role is strictly <strong>read-only</strong> and limited to <code>Describe</code>, <code>List</code>, and <code>Get</code> actions across the following services:</p>
+          <div class="service-tags">
+            <span class="service-tag">EC2</span>
+            <span class="service-tag">S3</span>
+            <span class="service-tag">RDS</span>
+            <span class="service-tag">CloudWatch</span>
+            <span class="service-tag">CloudTrail</span>
+            <span class="service-tag">DynamoDB</span>
+            <span class="service-tag">Lambda</span>
+            <span class="service-tag">ECS</span>
+            <span class="service-tag">EKS</span>
+            <span class="service-tag">ElastiCache</span>
+            <span class="service-tag">Aurora</span>
+            <span class="service-tag">Redshift</span>
+            <span class="service-tag">OpenSearch</span>
+            <span class="service-tag">EBS</span>
+            <span class="service-tag">EFS</span>
+            <span class="service-tag">Kinesis</span>
+            <span class="service-tag">SageMaker</span>
+            <span class="service-tag">Bedrock</span>
+            <span class="service-tag">CloudFront</span>
+            <span class="service-tag">VPC</span>
+            <span class="service-tag">ELB</span>
+            <span class="service-tag">EMR</span>
+            <span class="service-tag">Neptune</span>
+            <span class="service-tag">MemoryDB</span>
+            <span class="service-tag">MSK</span>
+            <span class="service-tag">MQ</span>
+            <span class="service-tag">DMS</span>
+            <span class="service-tag">Kendra</span>
+            <span class="service-tag">QuickSight</span>
+            <span class="service-tag">Transfer Family</span>
+            <span class="service-tag">AWS Backup</span>
+          </div>
+        </div>
+
+        <h3>Fixer Roles (Require Approval)</h3>
+        <div class="card" style="margin:12px 0 20px;">
+          <p>Fixer roles are created for executing approved optimizations. <strong>Critical security property:</strong> these roles are created by CloudFix in your account, but CloudFix <strong>cannot assume or access them</strong>. All fixer actions require explicit approval of central automation runbooks in AWS SSM Automation.</p>
+        </div>
+
+        <h3>Helper &amp; Cleanup Roles</h3>
+        <div class="card" style="margin:12px 0;">
+          <p>Auxiliary roles support housekeeping functions like resource cleanup after completed operations. These roles also follow least-privilege principles with account-level and resource-level permissions where possible.</p>
+        </div>
+      </div>
+
+      <!-- Infrastructure Security -->
+      <div class="section" id="infrastructure">
+        <h2>Infrastructure Security</h2>
+        <ul>
+          <li>CloudFix runs on AWS infrastructure with VPC isolation and security groups</li>
+          <li>No public endpoints for data processing</li>
+          <li>Customer onboarding via CloudFormation StackSet — fully auditable IaC</li>
+          <li>All fixes implemented via AWS SSM Automation with explicit customer approval of central automation runbooks</li>
+          <li>All data encrypted in transit (TLS 1.2+) and at rest (AES-256)</li>
+        </ul>
+      </div>
+
+      <!-- Application Security -->
+      <div class="section" id="application">
+        <h2>Application Security</h2>
+        <ul>
+          <li><strong>SOC 2 Type 2</strong> certified</li>
+          <li>Regular security assessments and penetration testing</li>
+          <li>HTTPS enforced on all endpoints</li>
+          <li>Session management with secure cookies</li>
+          <li>Role-based access control (RBAC) for multi-account setups</li>
+          <li>SSO/SAML available on Scale+ plans</li>
+        </ul>
+      </div>
+
+      <!-- Access Control -->
+      <div class="section" id="access-control">
+        <h2>Access Control</h2>
+        <ul>
+          <li><strong>Principle of least privilege</strong> — every IAM role is scoped to only the actions it needs</li>
+          <li><strong>Customer data isolation</strong> — per-account isolation ensures data separation</li>
+          <li><strong>Audit logging</strong> — all fix operations are logged and auditable</li>
+          <li><strong>No credential storage</strong> — CloudFix uses AWS IAM role assumption, not stored credentials</li>
+        </ul>
+      </div>
+
+      <!-- Incident Response -->
+      <div class="section" id="incident-response">
+        <h2>Incident Response</h2>
+        <ul>
+          <li>Documented incident response plan</li>
+          <li>Customer notification within <strong>24 hours</strong> for security incidents</li>
+          <li>Post-incident review and remediation</li>
+          <li>Security contact: use the contact form below</li>
+        </ul>
+      </div>
+
+      <!-- CTA -->
+      <div class="cta-banner">
+        <h3>Have security questions?</h3>
+        <p>Contact our security team or request detailed documentation.</p>
+        <div class="btn-group" style="justify-content:center;">
+          <a href="contact.html" class="btn">Contact Security Team</a>
+          <button class="btn" data-open-modal>Request Documentation</button>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- Request Access Modal -->
+<div class="modal-overlay" id="request-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Request Security Documentation</h3>
+      <button class="modal-close" id="modal-close">&times;</button>
+    </div>
+    <div class="modal-body">
+      <form id="request-access-form">
+        <div class="form-group">
+          <label for="req-name">Full Name *</label>
+          <input type="text" id="req-name" name="name" required>
+        </div>
+        <div class="form-group">
+          <label for="req-company">Company *</label>
+          <input type="text" id="req-company" name="company" required>
+        </div>
+        <div class="form-group">
+          <label for="req-email">Work Email *</label>
+          <input type="email" id="req-email" name="email" required>
+        </div>
+        <div class="form-group">
+          <label for="req-need">What do you need?</label>
+          <select id="req-need" name="document_type">
+            <option value="">Select...</option>
+            <option value="soc2-type1">SOC 2 Type 1 Report</option>
+            <option value="soc2-type2">SOC 2 Type 2 Report</option>
+            <option value="dpa">Data Processing Addendum (DPA)</option>
+            <option value="penetration-test">Penetration Test Summary</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="req-message">Additional details</label>
+          <textarea id="req-message" name="message" rows="3"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;">Submit Request</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script src="js/main.js"></script>
+</body>
+</html>

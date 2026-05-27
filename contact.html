@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact — CloudFix Trust Center</title>
+  <meta name="description" content="Contact the CloudFix security team, report vulnerabilities, or request documentation.">
+  <link rel="icon" type="image/png" href="assets/cloudfix-logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- Mobile Header -->
+<div class="mobile-header">
+  <div class="brand-row">
+    <img src="assets/cloudfix-logo.png" alt="CloudFix" class="logo-img">
+</div>
+<div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+<div class="layout">
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <img src="assets/cloudfix-logo.png" alt="CloudFix" class="logo-img">
+      <div class="brand-sub">Trust Center</div>
+    </div>
+    <div class="sidebar-nav">
+      <a href="security.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Security</a>
+      <a href="privacy.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>Privacy</a>
+      <a href="compliance.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>Compliance</a>
+      <a href="data-processing.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Data Processing</a>
+      <a href="status.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Status</a>
+      <a href="contact.html" class="active"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>Contact</a>
+    <div class="sidebar-footer"><a href="https://cloudfix.com" target="_blank" rel="noopener">← Back to cloudfix.com</a></div>
+  </nav>
+
+  <main class="main-content">
+    <div class="page-wrapper">
+
+      <div class="page-header">
+        <h1>Contact</h1>
+        <p class="subtitle">Get in touch with the CloudFix security and compliance team.</p>
+        <p class="last-updated" data-last-updated></p>
+      </div>
+
+      <!-- Contact Cards -->
+      <div class="section">
+        <h2>Security &amp; Compliance Contacts</h2>
+        <div class="card-grid" style="margin-top:16px;">
+          <div class="card">
+            <h3 style="margin-top:0;">Security Team</h3>
+            <p>For security concerns, incidents, or general security questions.</p>
+            <p><strong>Response time:</strong> 24 hours for security issues</p>
+            <p><a href="#contact-form" class="btn btn-sm">Report a Security Issue</a></p>
+          </div>
+          <div class="card">
+            <h3 style="margin-top:0;">Compliance &amp; Documentation</h3>
+            <p>For SOC 2 reports, DPA requests, or audit-related questions.</p>
+            <p><strong>Response time:</strong> 2 business days</p>
+            <p><a href="#contact-form" class="btn btn-sm">Request Documentation</a></p>
+          </div>
+          <div class="card">
+            <h3 style="margin-top:0;">General Support</h3>
+            <p>For product questions, onboarding, or account issues.</p>
+            <p><strong>Docs:</strong> <a href="https://support.cloudfix.com" target="_blank" rel="noopener">support.cloudfix.com</a></p>
+            <p><a href="#contact-form" class="btn btn-sm">Contact Support</a></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contact Form -->
+      <div class="section">
+        <h2>Send Us a Message</h2>
+        <div class="card" style="max-width:600px;">
+          <form id="contact-form">
+            <div class="form-group">
+              <label for="contact-name">Full Name *</label>
+              <input type="text" id="contact-name" name="name" required>
+            </div>
+            <div class="form-group">
+              <label for="contact-email">Email *</label>
+              <input type="email" id="contact-email" name="email" required>
+            </div>
+            <div class="form-group">
+              <label for="contact-company">Company</label>
+              <input type="text" id="contact-company" name="company">
+            </div>
+            <div class="form-group">
+              <label for="contact-subject">Subject *</label>
+              <select id="contact-subject" name="subject" required>
+                <option value="">Select a topic...</option>
+                <option value="security-question">Security Question</option>
+                <option value="vulnerability-report">Vulnerability Report</option>
+                <option value="document-request">Document Request (SOC 2, DPA)</option>
+                <option value="compliance-question">Compliance Question</option>
+                <option value="partnership">Partnership Inquiry</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="contact-message">Message *</label>
+              <textarea id="contact-message" name="message" rows="5" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;">Send Message</button>
+            <p class="form-inline-note" style="margin-top:8px;">For urgent security issues, select \"Vulnerability Report\" as the subject and we will respond within 24 hours.</p>
+          </form>
+        </div>
+      </div>
+
+      <!-- Vulnerability Reporting -->
+      <div class="section">
+        <h2>Vulnerability Reporting</h2>
+        <p>We take security vulnerabilities seriously and appreciate responsible disclosure. If you believe you've found a security vulnerability in CloudFix:</p>
+
+        <div class="highlight-box" style="margin-top:16px;">
+          <ol style="margin:0;">
+            <li><strong>Submit</strong> your findings using the contact form above, selecting \"Vulnerability Report\" as the subject, with full details of the vulnerability.</li>
+            <li><strong>Do not</strong> publicly disclose the vulnerability before we've had a chance to remediate it.</li>
+            <li>We will <strong>acknowledge receipt within 24 hours</strong> and provide an initial assessment within 72 hours.</li>
+            <li>We will <strong>keep you updated</strong> on remediation progress and notify you when the fix is deployed.</li>
+            <li>We ask that you <strong>allow 90 days</strong> for remediation before any public disclosure.</li>
+          </ol>
+        </div>
+
+        <div class="callout callout-info" style="margin-top:16px;">
+          <strong>PGP Key:</strong> For encrypted communications, use our PGP public key. <a href="assets/pgp-key.asc" download>Download PGP Key</a>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<script src="js/main.js"></script>
+</body>
+</html>
