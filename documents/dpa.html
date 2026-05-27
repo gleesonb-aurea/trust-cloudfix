@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CloudFix Data Processing Addendum (DPA)</title>
+<style>
+  @page { size: A4; margin: 2cm; }
+  body { font-family: 'Times New Roman', Georgia, serif; font-size: 12pt; line-height: 1.6; color: #000; max-width: 700px; margin: 0 auto; padding: 40px; }
+  h1 { font-size: 18pt; text-align: center; margin-bottom: 4px; }
+  h2 { font-size: 14pt; margin-top: 24px; border-bottom: 1px solid #000; padding-bottom: 4px; }
+  h3 { font-size: 12pt; margin-top: 16px; }
+  p { margin: 8px 0; }
+  table { width: 100%; border-collapse: collapse; margin: 12px 0; }
+  th, td { border: 1px solid #000; padding: 6px 8px; text-align: left; font-size: 11pt; }
+  th { background: #f0f0f0; }
+  .subtitle { text-align: center; font-size: 12pt; margin-bottom: 24px; color: #333; }
+  .effective-date { text-align: center; margin-bottom: 32px; }
+  .signature-block { margin-top: 40px; }
+  .sig-line { border-top: 1px solid #000; width: 250px; margin-top: 40px; padding-top: 4px; font-size: 10pt; }
+  .print-btn { position: fixed; top: 20px; right: 20px; padding: 10px 20px; background: #1e40af; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-family: sans-serif; }
+  @media print { .print-btn { display: none; } }
+</style>
+</head>
+<body>
+
+<button class="print-btn" onclick="window.print()">Save as PDF</button>
+
+<h1>DATA PROCESSING ADDENDUM</h1>
+<p class="subtitle">CloudFix (Aurea, Inc.) — Data Processing Terms</p>
+<p class="effective-date"><strong>Effective Date:</strong> May 27, 2026 | <strong>Version:</strong> 1.0</p>
+
+<p>This Data Processing Addendum ("DPA") forms part of the Terms of Service between Aurea, Inc. ("CloudFix", "Processor") and the customer identified in the applicable order ("Customer", "Controller") and governs the processing of personal data in connection with the CloudFix and RightSpend services.</p>
+
+<h2>1. Definitions</h2>
+<p>"Controller" means the Customer who determines the purposes and means of processing personal data.</p>
+<p>"Processor" means CloudFix (Aurea, Inc.) who processes personal data on behalf of the Controller.</p>
+<p>"Data Subjects" means individuals whose personal data is processed under this DPA.</p>
+<p>"Personal Data" means any information relating to an identified or identifiable natural person processed by Processor on behalf of Controller.</p>
+<p>"Processing" means any operation performed on Personal Data.</p>
+<p>"Sub-processor" means any third party engaged by Processor to process Personal Data.</p>
+<p>"Services" means the CloudFix and/or RightSpend services provided to Customer.</p>
+
+<h2>2. Scope and Roles</h2>
+<p>2.1 This DPA applies to the Processing of Personal Data by Processor on behalf of Controller in connection with the Services.</p>
+<p>2.2 The parties acknowledge and agree that: (a) Controller is the controller of Personal Data; (b) Processor is the processor of Personal Data on behalf of Controller; and (c) Processor will process Personal Data only in accordance with Controller's instructions.</p>
+<p>2.3 Processor shall process Personal Data only for the purposes described in this DPA and shall not process Personal Data for any other purpose unless expressly instructed by Controller.</p>
+
+<h2>3. Data Processing Details</h2>
+
+<h3>3.1 Subject Matter</h3>
+<p>The subject matter of the Processing is the provision of the Services as described in the Terms of Service.</p>
+
+<h3>3.2 Duration</h3>
+<p>The Processing will continue for the duration of the Services agreement unless terminated earlier in accordance with its terms.</p>
+
+<h3>3.3 Nature of Processing</h3>
+<p>CloudFix collects and processes AWS account metadata (account configuration, cost and usage reports, resource metadata) to provide cost optimization recommendations and automated fixes. RightSpend processes EC2 usage and reservation data to optimize Convertible Reserved Instances.</p>
+
+<h3>3.4 Categories of Data Subjects</h3>
+<p>Controller's employees and authorized users who access the CloudFix or RightSpend dashboard.</p>
+
+<h3>3.5 Categories of Personal Data</h3>
+<table>
+  <tr><th>Data Category</th><th>Description</th><th>Source</th></tr>
+  <tr><td>Account Information</td><td>Name, email address, company name</td><td>Provided by Customer during signup</td></tr>
+  <tr><td>Usage Data</td><td>Feature usage, dashboard interactions, fix approvals</td><td>Generated through Service use</td></tr>
+  <tr><td>AWS Metadata</td><td>Account ID, resource configuration, cost data</td><td>AWS APIs via read-only IAM role</td></tr>
+  <tr><td>Support Data</td><td>Support ticket content, communications</td><td>Customer support interactions</td></tr>
+</table>
+
+<h3>3.6 Data Not Collected</h3>
+<p>Processor does NOT collect: AWS credentials (secret keys, access keys), application data or content from customer AWS environments, or personally identifiable information from customer AWS accounts.</p>
+
+<h2>4. Processor Obligations</h2>
+<p>4.1 Processor shall process Personal Data only on documented instructions from Controller, including with regard to transfers of Personal Data to a third country, unless required to do so by applicable law.</p>
+<p>4.2 Processor shall ensure that persons authorized to process Personal Data have committed themselves to confidentiality or are under an appropriate statutory obligation of confidentiality.</p>
+<p>4.3 Processor shall implement appropriate technical and organizational measures to ensure a level of security appropriate to the risk, including as appropriate: (a) encryption of Personal Data; (b) ability to ensure ongoing confidentiality, integrity, availability and resilience of processing systems; (c) ability to restore availability and access to Personal Data in a timely manner in the event of a physical or technical incident; (d) regular testing and evaluation of the effectiveness of technical and organizational measures.</p>
+<p>4.4 Processor shall not engage a Sub-processor without prior specific or general written authorization of the Controller.</p>
+
+<h2>5. Security Measures</h2>
+<p>Processor maintains the following security measures:</p>
+<ul>
+  <li><strong>Encryption in transit:</strong> TLS 1.2+ for all data transmission</li>
+  <li><strong>Encryption at rest:</strong> AES-256 for stored data</li>
+  <li><strong>Access control:</strong> Principle of least privilege, role-based access, unique user accounts</li>
+  <li><strong>Infrastructure security:</strong> AWS VPC isolation, security groups, no public endpoints for data processing</li>
+  <li><strong>Audit logging:</strong> Comprehensive logging of system access and data operations</li>
+  <li><strong>Incident response:</strong> Documented incident response plan with 24-hour notification commitment</li>
+  <li><strong>Certifications:</strong> SOC 2 Type 2 certified</li>
+</ul>
+
+<h2>6. Sub-Processors</h2>
+<p>Controller acknowledges and agrees that Processor may engage the following Sub-processors:</p>
+<table>
+  <tr><th>Sub-processor</th><th>Purpose</th><th>Location</th></tr>
+  <tr><td>Amazon Web Services</td><td>Infrastructure hosting, Marketplace billing</td><td>US (us-east-1)</td></tr>
+  <tr><td>Cloudflare</td><td>CDN, DNS, DDoS protection</td><td>Global edge network</td></tr>
+  <tr><td>PostHog</td><td>Product analytics</td><td>US</td></tr>
+  <tr><td>Kayako</td><td>Customer support platform</td><td>US</td></tr>
+</table>
+<p>Processor shall inform Controller of any intended changes concerning the addition or replacement of Sub-processors, giving Controller the opportunity to object to such changes.</p>
+
+<h2>7. Data Subject Rights</h2>
+<p>7.1 Processor shall assist Controller in fulfilling its obligations to respond to Data Subject requests for exercising their rights under applicable data protection law.</p>
+<p>7.2 Upon written request, Processor shall provide reasonable assistance to Controller in the performance of its obligation to carry out data protection impact assessments.</p>
+
+<h2>8. Breach Notification</h2>
+<p>8.1 Processor shall notify Controller without undue delay and no later than 24 hours after becoming aware of a Personal Data breach.</p>
+<p>8.2 Such notification shall include: (a) the nature of the breach including, where possible, the categories and approximate number of Data Subjects concerned and the categories and approximate number of Personal Data records concerned; (b) the name and contact details of the contact point where more information can be obtained; (c) a description of the likely consequences of the Personal Data breach; and (d) a description of the measures taken or proposed to be taken to address the Personal Data breach.</p>
+
+<h2>9. Data Retention and Deletion</h2>
+<p>9.1 Upon termination of the Services agreement, Processor shall, at the election of Controller: (a) return all Personal Data to Controller; or (b) delete all Personal Data, unless storage is required by applicable law.</p>
+<p>9.2 Processor shall complete the return or deletion within 30 days of termination.</p>
+<p>9.3 Active account data is retained for the duration of the subscription. Deleted account data is purged within 30 days. Audit logs are retained for 1 year.</p>
+
+<h2>10. Audit Rights</h2>
+<p>10.1 Processor shall make available to Controller all information necessary to demonstrate compliance with this DPA.</p>
+<p>10.2 Processor shall allow for and contribute to audits, including inspections, conducted by Controller or an auditor mandated by Controller, subject to reasonable notice and confidentiality obligations.</p>
+<p>10.3 Processor's SOC 2 Type 2 report is available upon request and may satisfy Controller's audit requirements.</p>
+
+<h2>11. International Transfers</h2>
+<p>11.1 Processor processes Personal Data primarily in the United States. For transfers of Personal Data from the European Economic Area, the parties agree to comply with applicable data transfer mechanisms, including Standard Contractual Clauses where required.</p>
+
+<h2>12. Governing Law</h2>
+<p>This DPA shall be governed by and construed in accordance with the laws of the State of Delaware, United States, without regard to its conflict of law provisions.</p>
+
+<h2>13. Contact</h2>
+<p>For questions about this DPA or to exercise any rights described herein, please submit a request through the <a href="https://trust-cloudfix.pages.dev/contact.html">CloudFix Trust Center contact form</a>.</p>
+
+<div class="signature-block">
+  <h2>Signatures</h2>
+  <p>The parties have executed this Data Processing Addendum as of the Effective Date.</p>
+  
+  <div style="display:flex;gap:60px;margin-top:30px;">
+    <div>
+      <p><strong>Processor: Aurea, Inc. (CloudFix)</strong></p>
+      <div class="sig-line">Signature</div>
+      <p style="font-size:10pt;margin-top:8px;">Name: ________________________</p>
+      <p style="font-size:10pt;">Title: ________________________</p>
+      <p style="font-size:10pt;">Date: ________________________</p>
+    </div>
+    <div>
+      <p><strong>Controller: Customer</strong></p>
+      <div class="sig-line">Signature</div>
+      <p style="font-size:10pt;margin-top:8px;">Name: ________________________</p>
+      <p style="font-size:10pt;">Title: ________________________</p>
+      <p style="font-size:10pt;">Date: ________________________</p>
+    </div>
+  </div>
+</div>
+
+<p style="text-align:center;margin-top:40px;font-size:10pt;color:#666;">© 2026 Aurea, Inc. All rights reserved. | CloudFix Trust Center</p>
+
+</body>
+</html>
