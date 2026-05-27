@@ -315,6 +315,10 @@
           <label for="req-message">Additional details</label>
           <textarea id="req-message" name="message" rows="3"></textarea>
         </div>
+                <div class="form-group" style="display:none;opacity:0;height:0;overflow:hidden;" aria-hidden="true">
+          <label for="req-website">Website</label>
+          <input type="text" id="req-website" name="website" tabindex="-1" autocomplete="off">
+        </div>
         <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;" id="req-submit-btn">Submit Request</button>
           <p id="req-form-status" style="margin-top:8px;text-align:center;display:none;"></p>
       </form>
@@ -331,7 +335,9 @@
               fetch("https://automate.billgleeson.com/webhook/trust-center-contact", {
                 method: "POST",
                 headers: {"Content-Type": "application/json"},
-                body: JSON.stringify({
+                var hp = document.getElementById("req-website"); if(hp && hp.value){btn.disabled=false;btn.textContent="Submit Request";return;}
+              body: JSON.stringify({
+                  _t: Math.floor(Date.now()/1000),
                   name: document.getElementById("req-name").value,
                   email: document.getElementById("req-email").value,
                   company: document.getElementById("req-company").value,
