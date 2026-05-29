@@ -1,7 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" fill="none">
-  <circle cx="40" cy="40" r="36" fill="#EEF2FF" stroke="#4338CA" stroke-width="2"/>
-  <text x="40" y="34" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="10" font-weight="700" fill="#4338CA">FinOps</text>
-  <text x="40" y="48" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="8" font-weight="500" fill="#4338CA">Certified</text>
-  <circle cx="60" cy="60" r="10" fill="#4ADE80"/>
-  <path d="M56 60l3 3 5-5" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-</svg>
