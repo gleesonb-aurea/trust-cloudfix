@@ -251,14 +251,79 @@
         </ul>
       </div>
 
+      <!-- Encryption -->
+      <div class="section" id="encryption">
+        <h2>Encryption Standards</h2>
+        <ul>
+          <li><strong>Data in transit:</strong> TLS 1.2 minimum enforced on all endpoints. HTTPS enforced; HTTP connections are redirected.</li>
+          <li><strong>Data at rest:</strong> AES-256 encryption on all AWS storage services (S3, RDS, EBS).</li>
+          <li><strong>API authentication:</strong> All API calls use token-based authentication transmitted over TLS. Tokens are scoped and rotatable.</li>
+          <li><strong>No credentials stored:</strong> CloudFix uses AWS IAM role assumption (STS AssumeRole) — no long-lived credentials are stored.</li>
+        </ul>
+      </div>
+
+      <!-- Network Connectivity -->
+      <div class="section" id="network">
+        <h2>Network Connectivity Requirements</h2>
+        <p>CloudFix operates entirely over standard HTTPS. There are no requirements for dedicated network links, VPNs, or firewall tunnels.</p>
+
+        <h3>Outbound from Customer Account</h3>
+        <ul>
+          <li>CloudFix IAM roles in your AWS account call back to CloudFix over HTTPS (port 443) — standard AWS STS and SSM Automation traffic.</li>
+          <li>No inbound connections are made into your VPC or private subnets.</li>
+          <li>CloudFormation StackSets are deployed from AWS-managed infrastructure.</li>
+        </ul>
+
+        <h3>Webhooks (Optional — for ServiceNow and other integrations)</h3>
+        <p>CloudFix supports outbound webhooks for integrating with external platforms such as ServiceNow. When configured, CloudFix sends HTTPS POST requests to the webhook endpoint you specify (e.g. a ServiceNow inbound integration URL).</p>
+        <ul>
+          <li>Webhooks originate from CloudFix infrastructure hosted in AWS <code>us-east-1</code>.</li>
+          <li>If your ServiceNow instance requires IP allow-listing, contact CloudFix support to obtain the current egress IP range.</li>
+          <li>Webhook payloads are JSON over HTTPS. No customer AWS data payload beyond recommendation metadata (resource IDs, savings amounts, status).</li>
+        </ul>
+        <div class="callout callout-info" style="margin-top:12px;">
+          Webhook documentation: <a href="https://support.cloudfix.com/article/16954-using-webhooks-in-cloudfix" target="_blank" rel="noopener">Using Webhooks in CloudFix →</a>
+        </div>
+
+        <h3>IP Allow-listing</h3>
+        <p>CloudFix does not require customers to whitelist specific IPs for inbound access to their AWS accounts — IAM role trust relationships govern access. For outbound webhook allow-listing requirements, contact the CloudFix support team.</p>
+      </div>
+
+      <!-- API Documentation -->
+      <div class="section" id="api-docs">
+        <h2>API Documentation</h2>
+        <p>CloudFix provides a REST API for programmatic access to recommendations, approval workflows, and reporting. This is the primary integration surface for ServiceNow and other ITSM platforms.</p>
+        <div class="card-grid" style="margin-top:16px;">
+          <div class="card">
+            <h4 style="margin-top:0;">Customer Guide</h4>
+            <p class="text-sm text-muted">Authentication, API keys, rate limits, and getting started.</p>
+            <a href="https://support.cloudfix.com/article/129569-cloudfix-api-customer-guide" target="_blank" rel="noopener" class="btn btn-outline btn-sm" style="margin-top:12px;">View Guide →</a>
+          </div>
+          <div class="card">
+            <h4 style="margin-top:0;">Endpoint Summary</h4>
+            <p class="text-sm text-muted">Full list of available endpoints, parameters, and response schemas.</p>
+            <a href="https://support.cloudfix.com/article/129570-cloudfix-api-endpoint-summary" target="_blank" rel="noopener" class="btn btn-outline btn-sm" style="margin-top:12px;">View Endpoints →</a>
+          </div>
+          <div class="card">
+            <h4 style="margin-top:0;">Workflows &amp; Examples</h4>
+            <p class="text-sm text-muted">Example flows for listing, approving, and tracking recommendations via API.</p>
+            <a href="https://support.cloudfix.com/article/129571-cloudfix-api-workflows-and-examples" target="_blank" rel="noopener" class="btn btn-outline btn-sm" style="margin-top:12px;">View Examples →</a>
+          </div>
+        </div>
+        <div class="callout callout-info" style="margin-top:16px;">
+          <strong>Authentication:</strong> The CloudFix API uses bearer token authentication. Tokens are generated from the CloudFix dashboard and scoped to your account. All API traffic is over HTTPS (TLS 1.2+). There is no OAuth or service account model — API keys are the current authentication mechanism.
+        </div>
+      </div>
+
       <!-- Incident Response -->
       <div class="section" id="incident-response">
-        <h2>Incident Response</h2>
+        <h2>Incident Response &amp; Vulnerability Management</h2>
         <ul>
-          <li>Documented incident response plan</li>
-          <li>Customer notification within <strong>24 hours</strong> for security incidents</li>
-          <li>Post-incident review and remediation</li>
-          <li>Security contact: use the contact form below</li>
+          <li>Documented incident response plan aligned with SOC 2 requirements</li>
+          <li>Customer notification within <strong>24 hours</strong> for confirmed security incidents</li>
+          <li>Post-incident review and remediation process with root cause documentation</li>
+          <li>Regular security assessments and third-party penetration testing (results available under NDA)</li>
+          <li>Vulnerability disclosure: report security issues via the contact form — acknowledged within 1 business day</li>
         </ul>
       </div>
 
@@ -308,6 +373,7 @@
             <option value="privacy">Privacy Policy</option>
             <option value="rightspend">RightSpend Information</option>
             <option value="penetration-test">Penetration Test Summary</option>
+            <option value="architecture-diagram">Architecture Diagram</option>
             <option value="other">Other</option>
           </select>
         </div>

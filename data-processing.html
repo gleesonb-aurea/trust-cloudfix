@@ -81,6 +81,51 @@
         <p class="last-updated" data-last-updated></p>
       </div>
 
+      <!-- Data Residency -->
+      <div class="section" id="data-residency">
+        <h2>Data Residency &amp; Hosting</h2>
+        <p>CloudFix is hosted on Amazon Web Services (AWS) in the <strong>United States East (us-east-1)</strong> region. This is the single region where all customer data is processed and stored.</p>
+
+        <div class="table-responsive" style="margin-top:16px;">
+          <table>
+            <thead>
+              <tr><th>Component</th><th>Location</th><th>Provider</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Application &amp; APIs</td>
+                <td>AWS us-east-1 (N. Virginia)</td>
+                <td>Amazon Web Services</td>
+              </tr>
+              <tr>
+                <td>Customer Data Storage</td>
+                <td>AWS us-east-1 (N. Virginia)</td>
+                <td>Amazon Web Services</td>
+              </tr>
+              <tr>
+                <td>Cost &amp; Usage Report analysis</td>
+                <td>AWS us-east-1 (N. Virginia) — Athena/Glue</td>
+                <td>Amazon Web Services</td>
+              </tr>
+              <tr>
+                <td>CDN / Edge (dashboard only)</td>
+                <td>Global edge network</td>
+                <td>Cloudflare (HTTP metadata only — no AWS data)</td>
+              </tr>
+              <tr>
+                <td>Support platform</td>
+                <td>United States</td>
+                <td>Kayako (support ticket content only)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout callout-info" style="margin-top:16px;">
+          <strong>No data transfer outside the United States.</strong> CloudFix does not transfer AWS cost, usage, or resource metadata outside the US. If your organization has UK/EU data residency requirements, contact us to discuss options.
+        </div>
+      </div>
+
       <!-- DPA Summary -->
       <div class="section">
         <h2>Data Processing Addendum (DPA)</h2>
@@ -205,6 +250,68 @@
 
         <div class="callout callout-info" style="margin-top:16px;">
           <strong>Notification policy:</strong> CloudFix will notify customers at least 30 days before engaging any new sub-processor, providing an opportunity to object.
+        </div>
+      </div>
+
+      <!-- Data Transferred in Integrations -->
+      <div class="section" id="integration-data">
+        <h2>Data Transferred in Integrations (e.g. ServiceNow)</h2>
+        <p>When CloudFix is integrated with an external platform such as ServiceNow via webhook or API, the following describes what data is exchanged:</p>
+
+        <h3>Data CloudFix sends outbound (to ServiceNow)</h3>
+        <div class="table-responsive" style="margin-top:12px;">
+          <table>
+            <thead>
+              <tr><th>Data Type</th><th>Description</th><th>Personal Data?</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Recommendation metadata</td>
+                <td>AWS resource IDs, service type, estimated savings, status</td>
+                <td>No</td>
+              </tr>
+              <tr>
+                <td>Account/org identifiers</td>
+                <td>AWS account ID, account name as configured in CloudFix</td>
+                <td>No</td>
+              </tr>
+              <tr>
+                <td>Approval status updates</td>
+                <td>Approved/rejected, timestamp, approver username within CloudFix</td>
+                <td>Potentially (username)</td>
+              </tr>
+              <tr>
+                <td>Fix execution results</td>
+                <td>Success/failure status, completion timestamp</td>
+                <td>No</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>Data CloudFix receives inbound (from ServiceNow via API)</h3>
+        <div class="table-responsive" style="margin-top:12px;">
+          <table>
+            <thead>
+              <tr><th>Data Type</th><th>Description</th><th>Personal Data?</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Approval decisions</td>
+                <td>Approved/rejected signal for a specific recommendation ID</td>
+                <td>No</td>
+              </tr>
+              <tr>
+                <td>Approver identity (optional)</td>
+                <td>Name or user ID of the ServiceNow approver, if passed</td>
+                <td>Potentially (if name included)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout callout-info" style="margin-top:12px;">
+          <strong>No application data, S3 object contents, database records, or business data</strong> is accessed or transferred by CloudFix. CloudFix reads only AWS infrastructure metadata (resource IDs, configuration, cost/usage metrics).
         </div>
       </div>
 
