@@ -57,6 +57,10 @@
         <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="3" width="6" height="6" rx="1"/><rect x="9" y="3" width="6" height="6" rx="1"/><rect x="16" y="3" width="6" height="6" rx="1"/><rect x="5" y="14" width="6" height="6" rx="1"/><rect x="13" y="14" width="6" height="6" rx="1"/><line x1="5" y1="9" x2="5" y2="14"/><line x1="12" y1="9" x2="12" y2="14"/><line x1="19" y1="9" x2="16" y2="14"/></svg>
         Architecture
       </a>
+      <a href="support.html">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        Support &amp; SLA
+      </a>
             <a href="rightspend.html">
         <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
         RightSpend
@@ -141,10 +145,41 @@
       <!-- How It Works -->
       <div class="section">
         <h2>How CloudFix Works</h2>
-        <p>CloudFix connects to your AWS account through a CloudFormation StackSet that creates carefully scoped IAM roles. Customer data is accessed through a read-only finder role — no write actions are ever performed without your explicit approval of central automation runbooks through AWS SSM Automation.</p>
+        <p>CloudFix connects to your AWS account through a CloudFormation StackSet that creates carefully scoped IAM roles. Customer data is accessed through a read-oriented finder role — no write actions are ever performed without your explicit approval of change templates executed through AWS Systems Manager Change Manager and Automation runbooks.</p>
 
         <div class="callout callout-success" style="margin-top:16px;">
           <strong>Key principle:</strong> The fixer role is created by CloudFix but <strong>cannot be assumed or accessed by CloudFix</strong>. You retain full control over all changes to your infrastructure.
+        </div>
+      </div>
+
+      <!-- Quick Links -->
+      <div class="section">
+        <h2>Trust Center Documents</h2>
+        <div class="card-grid" style="margin-top:12px;">
+          <a href="security.html" class="card" style="text-decoration:none;color:inherit;">
+            <strong>Security</strong>
+            <p class="text-sm" style="margin:6px 0 0;">Encryption, IAM roles, network, incident response</p>
+          </a>
+          <a href="compliance.html" class="card" style="text-decoration:none;color:inherit;">
+            <strong>Compliance</strong>
+            <p class="text-sm" style="margin:6px 0 0;">SOC 2, GDPR, certifications, documentation requests</p>
+          </a>
+          <a href="data-processing.html" class="card" style="text-decoration:none;color:inherit;">
+            <strong>Data Processing</strong>
+            <p class="text-sm" style="margin:6px 0 0;">DPA, sub-processors, data residency, ITSM data flows</p>
+          </a>
+          <a href="architecture.html" class="card" style="text-decoration:none;color:inherit;">
+            <strong>Architecture</strong>
+            <p class="text-sm" style="margin:6px 0 0;">IAM role diagrams, ITSM integration flow</p>
+          </a>
+          <a href="support.html" class="card" style="text-decoration:none;color:inherit;">
+            <strong>Support &amp; SLA</strong>
+            <p class="text-sm" style="margin:6px 0 0;">Company overview, severity levels, escalation path, vulnerability disclosure</p>
+          </a>
+          <a href="privacy.html" class="card" style="text-decoration:none;color:inherit;">
+            <strong>Privacy</strong>
+            <p class="text-sm" style="margin:6px 0 0;">Privacy policy, data subject rights, GDPR basis</p>
+          </a>
         </div>
       </div>
 
