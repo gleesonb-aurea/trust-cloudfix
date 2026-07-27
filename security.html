@@ -296,11 +296,11 @@
           <li>CloudFormation StackSets are deployed from AWS-managed infrastructure.</li>
         </ul>
 
-        <h3>Webhooks (Optional — for ServiceNow and other integrations)</h3>
-        <p>CloudFix supports outbound webhooks for integrating with external platforms such as ServiceNow. When configured, CloudFix sends HTTPS POST requests to the webhook endpoint you specify (e.g. a ServiceNow inbound integration URL).</p>
+        <h3>Webhooks (Optional — for ITSM and other integrations)</h3>
+        <p>CloudFix supports outbound webhooks for integrating with external platforms such as service desk and ITSM tools. When configured, CloudFix sends HTTPS POST requests to the webhook endpoint you specify.</p>
         <ul>
           <li>Webhooks originate from CloudFix infrastructure hosted in AWS <code>us-east-1</code>.</li>
-          <li>If your ServiceNow instance requires IP allow-listing, contact CloudFix support to obtain the current egress IP range.</li>
+          <li>If your ITSM platform requires IP allow-listing, contact CloudFix support to obtain the current egress IP range.</li>
           <li>Webhook payloads are JSON over HTTPS. No customer AWS data payload beyond recommendation metadata (resource IDs, savings amounts, status).</li>
         </ul>
         <div class="callout callout-info" style="margin-top:12px;">
@@ -314,14 +314,14 @@
       <!-- Architecture Diagrams -->
       <div class="section" id="architecture">
         <h2>Architecture Diagrams</h2>
-        <p>Visual data flow diagrams covering the core CloudFix architecture and ITSM integration (ServiceNow, Jira, and similar platforms).</p>
+        <p>Visual data flow diagrams covering the core CloudFix architecture and ITSM / service desk integration.</p>
         <a href="architecture.html" class="btn btn-outline" style="margin-top:8px;">View Architecture Diagrams →</a>
       </div>
 
       <!-- API Documentation -->
       <div class="section" id="api-docs">
         <h2>API Documentation</h2>
-        <p>CloudFix provides a REST API for programmatic access to recommendations, approval workflows, and reporting. This is the primary integration surface for ServiceNow and other ITSM platforms.</p>
+        <p>CloudFix provides a REST API for programmatic access to recommendations, approval workflows, and reporting. This is the primary integration surface for ITSM and service desk platforms.</p>
         <div class="card-grid" style="margin-top:16px;">
           <div class="card">
             <h4 style="margin-top:0;">Customer Guide</h4>
@@ -343,7 +343,7 @@
           <strong>Authentication:</strong> The CloudFix API uses bearer token authentication. Tokens are generated from the CloudFix dashboard and scoped to your account. All API traffic is over HTTPS (TLS 1.2+). There is no OAuth or service account model — API keys are the current authentication mechanism.
         </div>
         <div class="callout callout-info" style="margin-top:12px;">
-          <strong>User authentication (relevant to ServiceNow integration):</strong> CloudFix user accounts are managed via <strong>AWS Cognito</strong> user pools. Cognito handles user authentication, session tokens, and password policies. For a ServiceNow integration using the CloudFix API on behalf of users, the API key mechanism is used rather than Cognito directly — Cognito is the underlying identity layer for the CloudFix dashboard and user management. SSO/SAML is available on Scale+ plans and can be configured to federate with your corporate identity provider.
+          <strong>User authentication (relevant to ITSM integrations):</strong> CloudFix user accounts are managed via <strong>AWS Cognito</strong> user pools. Cognito handles user authentication, session tokens, and password policies. For integrations using the CloudFix API on behalf of users, the API key mechanism is used rather than Cognito directly — Cognito is the underlying identity layer for the CloudFix dashboard and user management. SSO/SAML is available on Scale+ plans and can be configured to federate with your corporate identity provider.
         </div>
       </div>
 

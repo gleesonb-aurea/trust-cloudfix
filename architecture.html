@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Trust Center — CloudFix</title>
-  <meta name="description" content="CloudFix solution architecture diagrams — standalone and ITSM integration (ServiceNow, Jira, etc.).">
+  <meta name="description" content="CloudFix solution architecture diagrams — standalone and ITSM / service desk integration.">
   <link rel="icon" type="image/png" href="assets/cloudfix-logo.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -293,7 +293,7 @@
       <!-- Diagram 2: ITSM integration -->
       <div class="section" id="itsm">
         <h2>CloudFix + ITSM Integration</h2>
-        <p>How CloudFix integrates with service desk platforms (ServiceNow, Jira Service Management, and similar tools) via webhooks and the CloudFix REST API.</p>
+        <p>How CloudFix integrates with service desk and ITSM platforms via webhooks and the CloudFix REST API.</p>
 
         <div class="diagram-wrap">
           <!-- 820 × 560 viewport -->
@@ -316,7 +316,7 @@
             <!-- ── Zone: ITSM Platform (leftmost) ── -->
             <rect x="10" y="10" width="190" height="560" rx="10" fill="#F3F0FF" stroke="#6F42C1" stroke-width="1.5"/>
             <text x="105" y="32" text-anchor="middle" font-weight="700" font-size="13" fill="#3D1D8A">Service Desk</text>
-            <text x="105" y="47" text-anchor="middle" font-size="11" fill="#6F42C1">ServiceNow · Jira · etc.</text>
+            <text x="105" y="47" text-anchor="middle" font-size="11" fill="#6F42C1">Jira · ServiceDesk · etc.</text>
 
             <!-- ITSM Inbound webhook handler -->
             <rect x="25" y="65" width="160" height="52" rx="7" fill="#fff" stroke="#6F42C1" stroke-width="1"/>
@@ -494,7 +494,7 @@
           </svg>
           <p class="diagram-caption">Figure 2 — CloudFix + ITSM integration. CloudFix raises a webhook to your service desk when a recommendation is ready. The service desk routes approval through its own workflow, then calls the CloudFix API to signal approval. CloudFix then triggers execution via AWS Systems Manager.</p>
           <div class="diagram-legend">
-            <div class="legend-item"><div class="legend-swatch" style="background:#F3F0FF;border:1.5px solid #6F42C1;"></div> Service desk platform (ServiceNow, Jira, etc.)</div>
+            <div class="legend-item"><div class="legend-swatch" style="background:#F3F0FF;border:1.5px solid #6F42C1;"></div> Service desk / ITSM platform</div>
             <div class="legend-item"><div class="legend-swatch" style="background:#EBF2FA;border:1.5px solid #2A5F8F;"></div> CloudFix Platform (AWS us-east-1)</div>
             <div class="legend-item"><div class="legend-swatch" style="background:#EDFAF1;border:1.5px solid #28A745;"></div> Customer AWS Account</div>
             <div class="legend-item"><div class="legend-swatch" style="background:#FFF3CD;border:1px solid #FFC107;"></div> Approval boundary</div>
