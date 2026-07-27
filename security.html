@@ -111,14 +111,14 @@
           <div class="lifecycle-step">
             <div class="step-number">4</div>
             <div class="step-content">
-              <h4>Approved Execution via SSM Automation</h4>
-              <p>When you approve a fix, CloudFix executes it through central automation runbooks in AWS SSM Automation. You must explicitly approve the runbook before any changes are made. Changes are executed by a role on <strong>your account</strong> that CloudFix creates but <strong>cannot itself assume or access</strong>.</p>
+              <h4>Approved Execution via AWS Systems Manager</h4>
+              <p>When you approve a fix, CloudFix executes it through AWS Systems Manager (Change Manager and Automation runbooks). You must explicitly approve the change template before any changes are made. Changes are executed by a role on <strong>your account</strong> that CloudFix creates but <strong>cannot itself assume or access</strong>.</p>
             </div>
           </div>
         </div>
 
         <div class="callout callout-success" style="margin-top:16px;">
-          <strong>No changes to core services (EC2, Volumes, S3) are made unless a central automation runbook is approved by you.</strong> The fixer role is created by CloudFix but <strong>cannot be assumed or accessed by CloudFix</strong> — you retain full control.
+          <strong>No changes to core resources (EC2, Volumes, S3, RDS, etc.) are made unless a change template is approved by you.</strong> The fixer role is created by CloudFix but <strong>cannot be assumed or accessed by CloudFix directly</strong> — execution is orchestrated entirely through AWS Systems Manager within your account.
         </div>
       </div>
 
@@ -132,9 +132,9 @@
           <p><strong>cloudfix-athena-query-execution-role</strong> — Queries AWS Cost and Usage Reports via Amazon Athena. Manages AWS Organizations data and CloudFormation stack operations. This role processes billing data, not infrastructure data.</p>
         </div>
 
-        <h3>Finder Role (Read-Only)</h3>
+        <h3>Finder Role</h3>
         <div class="card" style="margin:12px 0 20px;">
-          <p><strong>cloudfix-finder-role</strong> — Discovers optimization opportunities across your AWS services. This role is strictly <strong>read-only</strong> and limited to <code>Describe</code>, <code>List</code>, and <code>Get</code> actions across the following services:</p>
+          <p><strong>cloudfix-finder-role</strong> — Discovers optimization opportunities across your AWS services. The vast majority of permissions are <code>Describe</code>, <code>List</code>, and <code>Get</code> — passive read operations that make no changes to your resources. The role also holds a small set of non-destructive write permissions required for normal operation: resource tagging (using a <code>cloudfix:</code> prefix), writing to CloudWatch Logs, querying Athena, and publishing SNS notifications. <strong>No permissions to read, modify, or delete application data, S3 object contents, or database records are included.</strong></p>
           <div class="service-tags">
             <span class="service-tag">EC2</span>
             <span class="service-tag">S3</span>
@@ -219,12 +219,30 @@
       <div class="section" id="infrastructure">
         <h2>Infrastructure Security</h2>
         <ul>
-          <li>CloudFix runs on AWS infrastructure with VPC isolation and security groups</li>
+          <li>CloudFix runs on AWS infrastructure (us-east-1) with VPC isolation and security groups</li>
           <li>No public endpoints for data processing</li>
           <li>Customer onboarding via CloudFormation StackSet — fully auditable IaC</li>
-          <li>All fixes implemented via AWS SSM Automation with explicit customer approval of central automation runbooks</li>
+          <li>All fixes implemented via AWS Systems Manager (Change Manager / Automation) with explicit customer approval</li>
           <li>All data encrypted in transit (TLS 1.2+) and at rest (AES-256)</li>
+          <li>Dashboard delivered via Amazon CloudFront (AWS CDN) — no third-party CDN providers</li>
         </ul>
+
+        <h3 style="margin-top:20px;">AWS-Native Footprint</h3>
+        <p>CloudFix deploys <strong>no user agents or third-party code</strong> into your AWS account. The only AWS services used within your account are:</p>
+        <div class="service-tags" style="margin-top:8px;">
+          <span class="service-tag">AWS CUR</span>
+          <span class="service-tag">CloudWatch</span>
+          <span class="service-tag">S3</span>
+          <span class="service-tag">Athena</span>
+          <span class="service-tag">Glue</span>
+          <span class="service-tag">Lambda</span>
+          <span class="service-tag">SSM</span>
+          <span class="service-tag">CloudFormation</span>
+          <span class="service-tag">SNS</span>
+        </div>
+
+        <h3 style="margin-top:20px;">CloudTrail Auditability</h3>
+        <p>Every API call made by CloudFix into your AWS account is logged in AWS CloudTrail and annotated with the CloudFix IAM role, identifying it as CloudFix-originated access. Where relevant, logs also identify the originating user. This gives you a complete, independent audit trail of all CloudFix activity — without relying on CloudFix's own logs.</p>
       </div>
 
       <!-- Application Security -->
@@ -312,6 +330,9 @@
         </div>
         <div class="callout callout-info" style="margin-top:16px;">
           <strong>Authentication:</strong> The CloudFix API uses bearer token authentication. Tokens are generated from the CloudFix dashboard and scoped to your account. All API traffic is over HTTPS (TLS 1.2+). There is no OAuth or service account model — API keys are the current authentication mechanism.
+        </div>
+        <div class="callout callout-info" style="margin-top:12px;">
+          <strong>User authentication (relevant to ServiceNow integration):</strong> CloudFix user accounts are managed via <strong>AWS Cognito</strong> user pools. Cognito handles user authentication, session tokens, and password policies. For a ServiceNow integration using the CloudFix API on behalf of users, the API key mechanism is used rather than Cognito directly — Cognito is the underlying identity layer for the CloudFix dashboard and user management. SSO/SAML is available on Scale+ plans and can be configured to federate with your corporate identity provider.
         </div>
       </div>
 

@@ -109,8 +109,8 @@
               </tr>
               <tr>
                 <td>CDN / Edge (dashboard only)</td>
-                <td>Global edge network</td>
-                <td>Cloudflare (HTTP metadata only — no AWS data)</td>
+                <td>AWS global edge network (origin: us-east-1)</td>
+                <td>Amazon CloudFront (AWS — HTTP metadata only, no AWS cost data)</td>
               </tr>
               <tr>
                 <td>Support platform</td>
@@ -206,15 +206,15 @@
           </div>
           <div class="accordion-item">
             <button class="accordion-header">
-              Cloudflare
+              Amazon CloudFront
               <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
             </button>
             <div class="accordion-body">
               <div class="accordion-body-inner">
-                <p><strong>Purpose:</strong> CDN, DNS, DDoS protection, and SSL termination for the CloudFix dashboard.</p>
+                <p><strong>Purpose:</strong> CDN and SSL termination for the CloudFix dashboard. Served via AWS CloudFront — part of the AWS infrastructure, not a separate third-party.</p>
                 <p><strong>Data processed:</strong> HTTP request metadata (does not see customer AWS data)</p>
-                <p><strong>Location:</strong> Global edge network</p>
-                <p><strong>Certifications:</strong> SOC 2 Type 2, ISO 27001, PCI DSS</p>
+                <p><strong>Location:</strong> AWS global edge network (origin: us-east-1)</p>
+                <p><strong>Certifications:</strong> SOC 1/2/3, ISO 27001, PCI DSS (inherited from AWS)</p>
               </div>
             </div>
           </div>
@@ -326,7 +326,7 @@
         <p>Cost and Usage Reports are queried via Amazon Athena and processed in-memory for analysis. Results (optimization recommendations) are stored in CloudFix's database. Raw CUR data is not stored long-term.</p>
 
         <h3>Fix Execution</h3>
-        <p>When you approve a fix, CloudFix executes it through a central automation runbook in AWS SSM Automation within <strong>your</strong> AWS account. The actual fix is executed by a role in your account that CloudFix creates but <strong>cannot itself assume or access</strong>.</p>
+        <p>When you approve a fix, CloudFix executes it through AWS Systems Manager (Change Manager and Automation runbooks) within <strong>your</strong> AWS account. The actual fix is executed by a role in your account (<code>cloudfix-ssm-assumed-role</code>) that CloudFix creates but <strong>cannot itself directly assume</strong> — execution is orchestrated by SSM within your account boundary.</p>
 
         <h3>Data Deletion</h3>
         <p>Upon contract termination, all customer data is automatically deleted within 30 days. This includes:</p>
