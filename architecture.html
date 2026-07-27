@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trust Center — CloudFix</title>
+  <meta name="description" content="CloudFix solution architecture diagrams — standalone and ITSM integration (ServiceNow, Jira, etc.).">
+  <link rel="icon" type="image/png" href="assets/cloudfix-logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .diagram-wrap {
+      background: #F8F9FA;
+      border: 1px solid #DEE2E6;
+      border-radius: 12px;
+      padding: 24px;
+      margin-top: 20px;
+      overflow-x: auto;
+    }
+    .diagram-wrap svg {
+      display: block;
+      margin: 0 auto;
+      max-width: 100%;
+      height: auto;
+    }
+    .diagram-caption {
+      font-size: 13px;
+      color: #868E96;
+      text-align: center;
+      margin-top: 12px;
+    }
+    .diagram-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-top: 16px;
+      font-size: 13px;
+      color: #495057;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .legend-swatch {
+      width: 14px;
+      height: 14px;
+      border-radius: 3px;
+      flex-shrink: 0;
+    }
+  </style>
+</head>
+<body>
+
+<div class="mobile-header">
+  <div class="brand-row">
+    <img src="assets/cloudfix-logo.png" alt="CloudFix" class="logo-img">
+  </div>
+  <button class="hamburger" id="hamburger" aria-label="Open menu">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+  </button>
+</div>
+<div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+<div class="layout">
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <img src="assets/cloudfix-logo.png" alt="CloudFix" class="logo-img">
+      <div class="brand-sub">Trust Center</div>
+    </div>
+    <div class="sidebar-nav">
+      <a href="index.html">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        Overview
+      </a>
+      <a href="security.html">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        Security
+      </a>
+      <a href="privacy.html">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+        Privacy
+      </a>
+      <a href="compliance.html">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        Compliance
+      </a>
+      <a href="data-processing.html">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        Data Processing
+      </a>
+      <a href="architecture.html" class="active">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="3" width="6" height="6" rx="1"/><rect x="9" y="3" width="6" height="6" rx="1"/><rect x="16" y="3" width="6" height="6" rx="1"/><rect x="5" y="14" width="6" height="6" rx="1"/><rect x="13" y="14" width="6" height="6" rx="1"/><line x1="5" y1="9" x2="5" y2="14"/><line x1="12" y1="9" x2="12" y2="14"/><line x1="19" y1="9" x2="16" y2="14"/></svg>
+        Architecture
+      </a>
+      <a href="rightspend.html">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+        RightSpend
+      </a>
+      <a href="status.html">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        Status
+      </a>
+      <a href="contact.html">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        Contact
+      </a>
+    </div>
+    <div class="sidebar-footer">
+      <a href="https://cloudfix.com" target="_blank" rel="noopener">← Back to cloudfix.com</a>
+    </div>
+  </nav>
+
+  <main class="main-content">
+    <div class="page-wrapper">
+
+      <div class="page-header">
+        <h1>Architecture Diagrams</h1>
+        <p class="subtitle">Solution architecture and data flow for enterprise security reviews.</p>
+        <p class="last-updated" data-last-updated></p>
+      </div>
+
+      <!-- Diagram 1: CloudFix standalone -->
+      <div class="section" id="standalone">
+        <h2>CloudFix — Core Architecture</h2>
+        <p>How CloudFix connects to your AWS environment, what it reads, and how approved fixes are executed — without any third-party ITSM integration.</p>
+
+        <div class="diagram-wrap">
+          <!-- 820 × 520 viewport -->
+          <svg viewBox="0 0 820 520" xmlns="http://www.w3.org/2000/svg" font-family="Inter, sans-serif" font-size="12">
+            <defs>
+              <marker id="arrow1" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                <path d="M0,0 L0,6 L8,3 z" fill="#1B3A5C"/>
+              </marker>
+              <marker id="arrow1g" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                <path d="M0,0 L0,6 L8,3 z" fill="#28A745"/>
+              </marker>
+              <marker id="arrow1r" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                <path d="M0,0 L0,6 L8,3 z" fill="#868E96"/>
+              </marker>
+            </defs>
+
+            <!-- ── Zone: CloudFix Platform (left) ── -->
+            <rect x="10" y="10" width="240" height="500" rx="10" fill="#EBF2FA" stroke="#2A5F8F" stroke-width="1.5"/>
+            <text x="130" y="32" text-anchor="middle" font-weight="700" font-size="13" fill="#0B1F3F">CloudFix Platform</text>
+            <text x="130" y="47" text-anchor="middle" font-size="11" fill="#2A5F8F">AWS us-east-1</text>
+
+            <!-- CloudFix App box -->
+            <rect x="30" y="60" width="200" height="58" rx="7" fill="#1B3A5C"/>
+            <text x="130" y="83" text-anchor="middle" font-weight="600" fill="#fff" font-size="12">CloudFix App &amp; API</text>
+            <text x="130" y="100" text-anchor="middle" fill="#93B8D8" font-size="11">REST API · HTTPS/TLS 1.2+</text>
+
+            <!-- Cognito -->
+            <rect x="30" y="132" width="92" height="48" rx="7" fill="#fff" stroke="#2A5F8F" stroke-width="1"/>
+            <text x="76" y="153" text-anchor="middle" font-weight="600" fill="#0B1F3F" font-size="11">AWS Cognito</text>
+            <text x="76" y="168" text-anchor="middle" fill="#495057" font-size="10">User auth</text>
+
+            <!-- CloudFront -->
+            <rect x="138" y="132" width="92" height="48" rx="7" fill="#fff" stroke="#2A5F8F" stroke-width="1"/>
+            <text x="184" y="153" text-anchor="middle" font-weight="600" fill="#0B1F3F" font-size="11">CloudFront</text>
+            <text x="184" y="168" text-anchor="middle" fill="#495057" font-size="10">CDN / HTTPS</text>
+
+            <!-- Analysis Engine -->
+            <rect x="30" y="196" width="200" height="48" rx="7" fill="#fff" stroke="#2A5F8F" stroke-width="1"/>
+            <text x="130" y="217" text-anchor="middle" font-weight="600" fill="#0B1F3F" font-size="11">Analysis Engine</text>
+            <text x="130" y="232" text-anchor="middle" fill="#495057" font-size="10">75+ cost finders · recommendations DB</text>
+
+            <!-- Athena/Glue -->
+            <rect x="30" y="260" width="92" height="48" rx="7" fill="#fff" stroke="#2A5F8F" stroke-width="1"/>
+            <text x="76" y="281" text-anchor="middle" font-weight="600" fill="#0B1F3F" font-size="11">Athena / Glue</text>
+            <text x="76" y="296" text-anchor="middle" fill="#495057" font-size="10">CUR query engine</text>
+
+            <!-- Lambda -->
+            <rect x="138" y="260" width="92" height="48" rx="7" fill="#fff" stroke="#2A5F8F" stroke-width="1"/>
+            <text x="184" y="281" text-anchor="middle" font-weight="600" fill="#0B1F3F" font-size="11">Lambda</text>
+            <text x="184" y="296" text-anchor="middle" fill="#495057" font-size="10">Events &amp; automation</text>
+
+            <!-- Dashboard -->
+            <rect x="30" y="440" width="200" height="48" rx="7" fill="#0B1F3F"/>
+            <text x="130" y="462" text-anchor="middle" font-weight="600" fill="#fff" font-size="11">CloudFix Dashboard</text>
+            <text x="130" y="477" text-anchor="middle" fill="#93B8D8" font-size="10">Approve/reject recommendations</text>
+
+            <!-- ── Zone: Customer AWS Account (right) ── -->
+            <rect x="300" y="10" width="510" height="500" rx="10" fill="#EDFAF1" stroke="#28A745" stroke-width="1.5"/>
+            <text x="555" y="32" text-anchor="middle" font-weight="700" font-size="13" fill="#155724">Customer AWS Account(s)</text>
+            <text x="555" y="47" text-anchor="middle" font-size="11" fill="#28A745">Deployed via CloudFormation StackSet · all changes audited in CloudTrail</text>
+
+            <!-- CloudFormation StackSet -->
+            <rect x="320" y="60" width="200" height="48" rx="7" fill="#fff" stroke="#28A745" stroke-width="1"/>
+            <text x="420" y="81" text-anchor="middle" font-weight="600" fill="#155724" font-size="11">CloudFormation StackSet</text>
+            <text x="420" y="96" text-anchor="middle" fill="#495057" font-size="10">Deploys IAM roles · fully auditable IaC</text>
+
+            <!-- Finder Role -->
+            <rect x="320" y="130" width="200" height="68" rx="7" fill="#fff" stroke="#28A745" stroke-width="1"/>
+            <text x="420" y="151" text-anchor="middle" font-weight="600" fill="#155724" font-size="11">cloudfix-finder-role</text>
+            <text x="420" y="166" text-anchor="middle" fill="#495057" font-size="10">Read: CUR · CloudWatch · resource metadata</text>
+            <text x="420" y="181" text-anchor="middle" fill="#868E96" font-size="10">Tagging (cloudfix: prefix) · CloudWatch Logs</text>
+
+            <!-- CUR / S3 / Athena in customer account -->
+            <rect x="320" y="218" width="92" height="58" rx="7" fill="#fff" stroke="#CED4DA" stroke-width="1"/>
+            <text x="366" y="240" text-anchor="middle" font-weight="600" fill="#0B1F3F" font-size="11">CUR + S3</text>
+            <text x="366" y="255" text-anchor="middle" fill="#495057" font-size="10">Cost &amp; Usage</text>
+            <text x="366" y="269" text-anchor="middle" fill="#495057" font-size="10">Reports bucket</text>
+
+            <!-- CloudWatch -->
+            <rect x="428" y="218" width="92" height="58" rx="7" fill="#fff" stroke="#CED4DA" stroke-width="1"/>
+            <text x="474" y="240" text-anchor="middle" font-weight="600" fill="#0B1F3F" font-size="11">CloudWatch</text>
+            <text x="474" y="255" text-anchor="middle" fill="#495057" font-size="10">Usage metrics</text>
+            <text x="474" y="269" text-anchor="middle" fill="#495057" font-size="10">for finders</text>
+
+            <!-- CloudTrail -->
+            <rect x="590" y="218" width="200" height="58" rx="7" fill="#fff" stroke="#CED4DA" stroke-width="1"/>
+            <text x="690" y="240" text-anchor="middle" font-weight="600" fill="#0B1F3F" font-size="11">CloudTrail</text>
+            <text x="690" y="255" text-anchor="middle" fill="#495057" font-size="10">All CloudFix API calls logged</text>
+            <text x="690" y="269" text-anchor="middle" fill="#868E96" font-size="10">annotated with CloudFix role</text>
+
+            <!-- Approval boundary -->
+            <rect x="320" y="300" width="470" height="16" rx="4" fill="#FFF3CD"/>
+            <text x="555" y="312" text-anchor="middle" font-size="10" fill="#856404" font-weight="600">── Customer approval required before any changes execute ──</text>
+
+            <!-- SSM Change Manager -->
+            <rect x="320" y="330" width="200" height="68" rx="7" fill="#fff" stroke="#28A745" stroke-width="1"/>
+            <text x="420" y="351" text-anchor="middle" font-weight="600" fill="#155724" font-size="11">AWS Systems Manager</text>
+            <text x="420" y="366" text-anchor="middle" fill="#495057" font-size="10">Change Manager + Automation</text>
+            <text x="420" y="381" text-anchor="middle" fill="#868E96" font-size="10">Orchestrates approved runbooks</text>
+
+            <!-- SSM Assumed Role -->
+            <rect x="320" y="418" width="200" height="68" rx="7" fill="#fff" stroke="#28A745" stroke-width="1"/>
+            <text x="420" y="439" text-anchor="middle" font-weight="600" fill="#155724" font-size="11">cloudfix-ssm-assumed-role</text>
+            <text x="420" y="454" text-anchor="middle" fill="#495057" font-size="10">Executes approved fixes</text>
+            <text x="420" y="469" text-anchor="middle" fill="#868E96" font-size="10">Cannot be assumed by CloudFix directly</text>
+
+            <!-- AWS resources box -->
+            <rect x="570" y="330" width="220" height="156" rx="7" fill="#fff" stroke="#CED4DA" stroke-width="1" stroke-dasharray="5,3"/>
+            <text x="680" y="352" text-anchor="middle" font-weight="600" fill="#0B1F3F" font-size="11">Customer AWS Resources</text>
+            <text x="680" y="370" text-anchor="middle" fill="#495057" font-size="10">EC2 · RDS · EBS · ECS · EKS</text>
+            <text x="680" y="385" text-anchor="middle" fill="#495057" font-size="10">ElastiCache · EFS · Lambda</text>
+            <text x="680" y="400" text-anchor="middle" fill="#495057" font-size="10">Redshift · OpenSearch · S3</text>
+            <text x="680" y="420" text-anchor="middle" fill="#868E96" font-size="10">Modified only after explicit</text>
+            <text x="680" y="434" text-anchor="middle" fill="#868E96" font-size="10">approval via SSM</text>
+            <text x="680" y="474" text-anchor="middle" fill="#28A745" font-size="10" font-weight="600">No app data accessed</text>
+
+            <!-- ── Arrows ── -->
+            <!-- User → Dashboard -->
+            <line x1="130" y1="440" x2="130" y2="393" stroke="#868E96" stroke-width="1.2" marker-end="url(#arrow1r)" stroke-dasharray="4,2"/>
+            <text x="118" y="420" text-anchor="end" fill="#868E96" font-size="10">Browser</text>
+
+            <!-- Dashboard → API -->
+            <line x1="130" y1="440" x2="130" y2="120" stroke="#868E96" stroke-width="1" stroke-dasharray="4,2"/>
+
+            <!-- CloudFix → StackSet (onboarding, labelled) -->
+            <line x1="250" y1="84" x2="318" y2="84" stroke="#1B3A5C" stroke-width="1.5" marker-end="url(#arrow1)"/>
+            <text x="284" y="78" text-anchor="middle" fill="#1B3A5C" font-size="10">Deploy</text>
+
+            <!-- StackSet → Finder Role -->
+            <line x1="420" y1="108" x2="420" y2="128" stroke="#28A745" stroke-width="1.2" marker-end="url(#arrow1g)"/>
+
+            <!-- Finder → CUR -->
+            <line x1="390" y1="198" x2="366" y2="216" stroke="#1B3A5C" stroke-width="1.2" marker-end="url(#arrow1)"/>
+            <!-- Finder → CloudWatch -->
+            <line x1="440" y1="198" x2="460" y2="216" stroke="#1B3A5C" stroke-width="1.2" marker-end="url(#arrow1)"/>
+            <!-- Finder → CloudTrail (read) -->
+            <line x1="520" y1="164" x2="588" y2="248" stroke="#1B3A5C" stroke-width="1" stroke-dasharray="3,2" marker-end="url(#arrow1)"/>
+
+            <!-- Finder → CloudFix App (metadata back) -->
+            <path d="M320,164 C260,164 250,164 250,89" stroke="#1B3A5C" stroke-width="1.5" fill="none" marker-end="url(#arrow1)"/>
+            <text x="275" y="140" text-anchor="middle" fill="#1B3A5C" font-size="10">Metadata</text>
+
+            <!-- CloudFix App → SSM (trigger change request) -->
+            <path d="M250,89 C290,89 300,89 318,354" stroke="#28A745" stroke-width="1.5" fill="none" marker-end="url(#arrow1g)"/>
+            <text x="270" y="230" text-anchor="middle" fill="#28A745" font-size="10">Change</text>
+            <text x="270" y="242" text-anchor="middle" fill="#28A745" font-size="10">request</text>
+
+            <!-- SSM → Assumed role -->
+            <line x1="420" y1="398" x2="420" y2="416" stroke="#28A745" stroke-width="1.5" marker-end="url(#arrow1g)"/>
+
+            <!-- Assumed role → AWS resources -->
+            <line x1="522" y1="452" x2="568" y2="430" stroke="#28A745" stroke-width="1.5" marker-end="url(#arrow1g)"/>
+            <text x="548" y="446" text-anchor="middle" fill="#28A745" font-size="10">Execute</text>
+
+          </svg>
+          <p class="diagram-caption">Figure 1 — CloudFix core architecture. Data flows left (CloudFix platform) ↔ right (customer AWS account). No application data is accessed; only infrastructure metadata.</p>
+          <div class="diagram-legend">
+            <div class="legend-item"><div class="legend-swatch" style="background:#EBF2FA;border:1.5px solid #2A5F8F;"></div> CloudFix Platform (AWS us-east-1)</div>
+            <div class="legend-item"><div class="legend-swatch" style="background:#EDFAF1;border:1.5px solid #28A745;"></div> Customer AWS Account</div>
+            <div class="legend-item"><div class="legend-swatch" style="background:#FFF3CD;border:1px solid #FFC107;"></div> Approval boundary — customer must approve before fixes execute</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Diagram 2: ITSM integration -->
+      <div class="section" id="itsm">
+        <h2>CloudFix + ITSM Integration</h2>
+        <p>How CloudFix integrates with service desk platforms (ServiceNow, Jira Service Management, and similar tools) via webhooks and the CloudFix REST API.</p>
+
+        <div class="diagram-wrap">
+          <!-- 820 × 560 viewport -->
+          <svg viewBox="0 0 900 580" xmlns="http://www.w3.org/2000/svg" font-family="Inter, sans-serif" font-size="12">
+            <defs>
+              <marker id="a2b" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                <path d="M0,0 L0,6 L8,3 z" fill="#1B3A5C"/>
+              </marker>
+              <marker id="a2g" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                <path d="M0,0 L0,6 L8,3 z" fill="#28A745"/>
+              </marker>
+              <marker id="a2t" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                <path d="M0,0 L0,6 L8,3 z" fill="#17A2B8"/>
+              </marker>
+              <marker id="a2r" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                <path d="M0,0 L0,6 L8,3 z" fill="#868E96"/>
+              </marker>
+            </defs>
+
+            <!-- ── Zone: ITSM Platform (leftmost) ── -->
+            <rect x="10" y="10" width="190" height="560" rx="10" fill="#F3F0FF" stroke="#6F42C1" stroke-width="1.5"/>
+            <text x="105" y="32" text-anchor="middle" font-weight="700" font-size="13" fill="#3D1D8A">Service Desk</text>
+            <text x="105" y="47" text-anchor="middle" font-size="11" fill="#6F42C1">ServiceNow · Jira · etc.</text>
+
+            <!-- ITSM Inbound webhook handler -->
+            <rect x="25" y="65" width="160" height="52" rx="7" fill="#fff" stroke="#6F42C1" stroke-width="1"/>
+            <text x="105" y="86" text-anchor="middle" font-weight="600" fill="#3D1D8A" font-size="11">Inbound Integration</text>
+            <text x="105" y="101" text-anchor="middle" fill="#495057" font-size="10">Receives webhook events</text>
+
+            <!-- ITSM Ticket -->
+            <rect x="25" y="135" width="160" height="68" rx="7" fill="#fff" stroke="#6F42C1" stroke-width="1"/>
+            <text x="105" y="156" text-anchor="middle" font-weight="600" fill="#3D1D8A" font-size="11">Change / Incident Ticket</text>
+            <text x="105" y="171" text-anchor="middle" fill="#495057" font-size="10">Created automatically</text>
+            <text x="105" y="186" text-anchor="middle" fill="#868E96" font-size="10">resource ID · savings · status</text>
+
+            <!-- Approval workflow -->
+            <rect x="25" y="225" width="160" height="52" rx="7" fill="#fff" stroke="#6F42C1" stroke-width="1"/>
+            <text x="105" y="246" text-anchor="middle" font-weight="600" fill="#3D1D8A" font-size="11">Approval Workflow</text>
+            <text x="105" y="261" text-anchor="middle" fill="#495057" font-size="10">Human review &amp; approval</text>
+
+            <!-- ITSM outbound REST call -->
+            <rect x="25" y="299" width="160" height="52" rx="7" fill="#fff" stroke="#6F42C1" stroke-width="1"/>
+            <text x="105" y="320" text-anchor="middle" font-weight="600" fill="#3D1D8A" font-size="11">Outbound API Call</text>
+            <text x="105" y="335" text-anchor="middle" fill="#495057" font-size="10">HTTPS POST → CloudFix API</text>
+
+            <!-- Data note -->
+            <rect x="25" y="490" width="160" height="68" rx="7" fill="#F3F0FF" stroke="#6F42C1" stroke-width="1" stroke-dasharray="4,2"/>
+            <text x="105" y="511" text-anchor="middle" font-weight="600" fill="#3D1D8A" font-size="11">Data received</text>
+            <text x="105" y="526" text-anchor="middle" fill="#495057" font-size="10">Resource IDs · savings</text>
+            <text x="105" y="541" text-anchor="middle" fill="#495057" font-size="10">status · account name</text>
+            <text x="105" y="556" text-anchor="middle" fill="#868E96" font-size="10">No app/business data</text>
+
+            <!-- ── Zone: CloudFix Platform (centre) ── -->
+            <rect x="220" y="10" width="230" height="560" rx="10" fill="#EBF2FA" stroke="#2A5F8F" stroke-width="1.5"/>
+            <text x="335" y="32" text-anchor="middle" font-weight="700" font-size="13" fill="#0B1F3F">CloudFix Platform</text>
+            <text x="335" y="47" text-anchor="middle" font-size="11" fill="#2A5F8F">AWS us-east-1</text>
+
+            <!-- CloudFix API -->
+            <rect x="235" y="65" width="200" height="52" rx="7" fill="#1B3A5C"/>
+            <text x="335" y="86" text-anchor="middle" font-weight="600" fill="#fff" font-size="12">CloudFix API</text>
+            <text x="335" y="101" text-anchor="middle" fill="#93B8D8" font-size="10">Bearer token auth · HTTPS/TLS 1.2+</text>
+
+            <!-- Webhook engine -->
+            <rect x="235" y="135" width="200" height="52" rx="7" fill="#fff" stroke="#2A5F8F" stroke-width="1"/>
+            <text x="335" y="156" text-anchor="middle" font-weight="600" fill="#0B1F3F" font-size="11">Webhook Engine</text>
+            <text x="335" y="171" text-anchor="middle" fill="#495057" font-size="10">Sends HTTPS POST on events</text>
+
+            <!-- Cognito -->
+            <rect x="235" y="205" width="92" height="48" rx="7" fill="#fff" stroke="#2A5F8F" stroke-width="1"/>
+            <text x="281" y="225" text-anchor="middle" font-weight="600" fill="#0B1F3F" font-size="11">Cognito</text>
+            <text x="281" y="240" text-anchor="middle" fill="#495057" font-size="10">User auth</text>
+
+            <!-- CloudFront -->
+            <rect x="343" y="205" width="92" height="48" rx="7" fill="#fff" stroke="#2A5F8F" stroke-width="1"/>
+            <text x="389" y="225" text-anchor="middle" font-weight="600" fill="#0B1F3F" font-size="11">CloudFront</text>
+            <text x="389" y="240" text-anchor="middle" fill="#495057" font-size="10">CDN / HTTPS</text>
+
+            <!-- Analysis engine -->
+            <rect x="235" y="270" width="200" height="48" rx="7" fill="#fff" stroke="#2A5F8F" stroke-width="1"/>
+            <text x="335" y="291" text-anchor="middle" font-weight="600" fill="#0B1F3F" font-size="11">Analysis Engine</text>
+            <text x="335" y="306" text-anchor="middle" fill="#495057" font-size="10">75+ finders · recommendations DB</text>
+
+            <!-- Dashboard -->
+            <rect x="235" y="335" width="200" height="48" rx="7" fill="#0B1F3F"/>
+            <text x="335" y="356" text-anchor="middle" font-weight="600" fill="#fff" font-size="11">Dashboard</text>
+            <text x="335" y="371" text-anchor="middle" fill="#93B8D8" font-size="10">Approve / review (web UI)</text>
+
+            <!-- API key note -->
+            <rect x="235" y="490" width="200" height="68" rx="7" fill="#EBF2FA" stroke="#2A5F8F" stroke-width="1" stroke-dasharray="4,2"/>
+            <text x="335" y="511" text-anchor="middle" font-weight="600" fill="#0B1F3F" font-size="11">API authentication</text>
+            <text x="335" y="526" text-anchor="middle" fill="#495057" font-size="10">Bearer token (API key)</text>
+            <text x="335" y="541" text-anchor="middle" fill="#495057" font-size="10">scoped to account</text>
+            <text x="335" y="556" text-anchor="middle" fill="#868E96" font-size="10">generated in dashboard</text>
+
+            <!-- ── Zone: Customer AWS Account (right) ── -->
+            <rect x="470" y="10" width="420" height="560" rx="10" fill="#EDFAF1" stroke="#28A745" stroke-width="1.5"/>
+            <text x="680" y="32" text-anchor="middle" font-weight="700" font-size="13" fill="#155724">Customer AWS Account(s)</text>
+            <text x="680" y="47" text-anchor="middle" font-size="11" fill="#28A745">All activity audited in CloudTrail</text>
+
+            <!-- CloudFormation -->
+            <rect x="485" y="65" width="185" height="48" rx="7" fill="#fff" stroke="#28A745" stroke-width="1"/>
+            <text x="577" y="86" text-anchor="middle" font-weight="600" fill="#155724" font-size="11">CloudFormation StackSet</text>
+            <text x="577" y="101" text-anchor="middle" fill="#495057" font-size="10">Deploys IAM roles</text>
+
+            <!-- Finder role -->
+            <rect x="485" y="130" width="185" height="68" rx="7" fill="#fff" stroke="#28A745" stroke-width="1"/>
+            <text x="577" y="151" text-anchor="middle" font-weight="600" fill="#155724" font-size="11">cloudfix-finder-role</text>
+            <text x="577" y="166" text-anchor="middle" fill="#495057" font-size="10">Read CUR · CloudWatch</text>
+            <text x="577" y="181" text-anchor="middle" fill="#868E96" font-size="10">Tagging · CloudWatch Logs</text>
+
+            <!-- CUR/S3 -->
+            <rect x="485" y="218" width="85" height="52" rx="7" fill="#fff" stroke="#CED4DA" stroke-width="1"/>
+            <text x="527" y="240" text-anchor="middle" font-weight="600" fill="#0B1F3F" font-size="11">CUR + S3</text>
+            <text x="527" y="255" text-anchor="middle" fill="#495057" font-size="10">Usage reports</text>
+
+            <!-- CloudWatch -->
+            <rect x="585" y="218" width="85" height="52" rx="7" fill="#fff" stroke="#CED4DA" stroke-width="1"/>
+            <text x="627" y="240" text-anchor="middle" font-weight="600" fill="#0B1F3F" font-size="11">CloudWatch</text>
+            <text x="627" y="255" text-anchor="middle" fill="#495057" font-size="10">Metrics</text>
+
+            <!-- CloudTrail -->
+            <rect x="685" y="218" width="185" height="52" rx="7" fill="#fff" stroke="#CED4DA" stroke-width="1"/>
+            <text x="777" y="240" text-anchor="middle" font-weight="600" fill="#0B1F3F" font-size="11">CloudTrail</text>
+            <text x="777" y="255" text-anchor="middle" fill="#495057" font-size="10">Independent audit log</text>
+
+            <!-- Approval band -->
+            <rect x="485" y="288" width="390" height="14" rx="3" fill="#FFF3CD"/>
+            <text x="680" y="299" text-anchor="middle" font-size="10" fill="#856404" font-weight="600">── Approval required (ITSM or Dashboard) before changes execute ──</text>
+
+            <!-- SSM -->
+            <rect x="485" y="316" width="185" height="58" rx="7" fill="#fff" stroke="#28A745" stroke-width="1"/>
+            <text x="577" y="337" text-anchor="middle" font-weight="600" fill="#155724" font-size="11">AWS Systems Manager</text>
+            <text x="577" y="352" text-anchor="middle" fill="#495057" font-size="10">Change Manager + Automation</text>
+            <text x="577" y="367" text-anchor="middle" fill="#868E96" font-size="10">Orchestrates runbooks</text>
+
+            <!-- SSM Assumed -->
+            <rect x="485" y="392" width="185" height="58" rx="7" fill="#fff" stroke="#28A745" stroke-width="1"/>
+            <text x="577" y="413" text-anchor="middle" font-weight="600" fill="#155724" font-size="11">cloudfix-ssm-assumed-role</text>
+            <text x="577" y="428" text-anchor="middle" fill="#495057" font-size="10">Executes approved fixes</text>
+            <text x="577" y="443" text-anchor="middle" fill="#868E96" font-size="10">Not directly assumable by CloudFix</text>
+
+            <!-- AWS Resources -->
+            <rect x="685" y="316" width="185" height="134" rx="7" fill="#fff" stroke="#CED4DA" stroke-width="1" stroke-dasharray="5,3"/>
+            <text x="777" y="338" text-anchor="middle" font-weight="600" fill="#0B1F3F" font-size="11">Customer AWS Resources</text>
+            <text x="777" y="356" text-anchor="middle" fill="#495057" font-size="10">EC2 · RDS · EBS · ECS</text>
+            <text x="777" y="371" text-anchor="middle" fill="#495057" font-size="10">ElastiCache · S3 · Lambda…</text>
+            <text x="777" y="395" text-anchor="middle" fill="#868E96" font-size="10">Modified only after</text>
+            <text x="777" y="409" text-anchor="middle" fill="#868E96" font-size="10">approved changes</text>
+            <text x="777" y="432" text-anchor="middle" fill="#28A745" font-size="10" font-weight="600">No app data accessed</text>
+
+            <!-- ── Arrows ── -->
+            <!-- CF webhook → ITSM inbound -->
+            <line x1="235" y1="155" x2="187" y2="100" stroke="#17A2B8" stroke-width="1.5" marker-end="url(#a2t)"/>
+            <text x="196" y="123" text-anchor="end" fill="#17A2B8" font-size="10">Webhook</text>
+            <text x="196" y="134" text-anchor="end" fill="#17A2B8" font-size="10">HTTPS POST</text>
+
+            <!-- ITSM ticket created -->
+            <line x1="105" y1="117" x2="105" y2="133" stroke="#6F42C1" stroke-width="1.2" marker-end="url(#a2t)"/>
+
+            <!-- Ticket → approval -->
+            <line x1="105" y1="203" x2="105" y2="223" stroke="#6F42C1" stroke-width="1.2" marker-end="url(#a2t)"/>
+
+            <!-- Approval → outbound -->
+            <line x1="105" y1="277" x2="105" y2="297" stroke="#6F42C1" stroke-width="1.2" marker-end="url(#a2t)"/>
+
+            <!-- ITSM outbound → CloudFix API -->
+            <line x1="187" y1="325" x2="233" y2="89" stroke="#6F42C1" stroke-width="1.5" marker-end="url(#a2t)"/>
+            <text x="200" y="220" text-anchor="start" fill="#6F42C1" font-size="10">Approval</text>
+            <text x="200" y="231" text-anchor="start" fill="#6F42C1" font-size="10">signal</text>
+
+            <!-- CloudFix API → finder (deploy/trigger) -->
+            <line x1="450" y1="80" x2="483" y2="80" stroke="#1B3A5C" stroke-width="1.5" marker-end="url(#a2b)"/>
+            <text x="466" y="74" text-anchor="middle" fill="#1B3A5C" font-size="10">Deploy</text>
+
+            <!-- Finder → CUR -->
+            <line x1="555" y1="198" x2="530" y2="216" stroke="#1B3A5C" stroke-width="1.2" marker-end="url(#a2b)"/>
+            <!-- Finder → CW -->
+            <line x1="590" y1="198" x2="615" y2="216" stroke="#1B3A5C" stroke-width="1.2" marker-end="url(#a2b)"/>
+            <!-- Finder → CloudTrail (read) -->
+            <line x1="670" y1="164" x2="730" y2="216" stroke="#1B3A5C" stroke-width="1" stroke-dasharray="3,2" marker-end="url(#a2b)"/>
+
+            <!-- Finder → CloudFix (metadata back) -->
+            <path d="M485,164 C460,164 450,130 450,91" stroke="#1B3A5C" stroke-width="1.5" fill="none" marker-end="url(#a2b)"/>
+            <text x="455" y="132" text-anchor="end" fill="#1B3A5C" font-size="10">Metadata</text>
+
+            <!-- CloudFix → SSM (change request) -->
+            <path d="M450,91 C465,91 475,300 483,340" stroke="#28A745" stroke-width="1.5" fill="none" marker-end="url(#a2g)"/>
+            <text x="440" y="240" text-anchor="end" fill="#28A745" font-size="10">Change</text>
+            <text x="440" y="251" text-anchor="end" fill="#28A745" font-size="10">request</text>
+
+            <!-- SSM → assumed role -->
+            <line x1="577" y1="374" x2="577" y2="390" stroke="#28A745" stroke-width="1.5" marker-end="url(#a2g)"/>
+
+            <!-- Assumed role → resources -->
+            <line x1="672" y1="421" x2="683" y2="400" stroke="#28A745" stroke-width="1.5" marker-end="url(#a2g)"/>
+            <text x="680" y="415" text-anchor="middle" fill="#28A745" font-size="10">Execute</text>
+
+          </svg>
+          <p class="diagram-caption">Figure 2 — CloudFix + ITSM integration. CloudFix raises a webhook to your service desk when a recommendation is ready. The service desk routes approval through its own workflow, then calls the CloudFix API to signal approval. CloudFix then triggers execution via AWS Systems Manager.</p>
+          <div class="diagram-legend">
+            <div class="legend-item"><div class="legend-swatch" style="background:#F3F0FF;border:1.5px solid #6F42C1;"></div> Service desk platform (ServiceNow, Jira, etc.)</div>
+            <div class="legend-item"><div class="legend-swatch" style="background:#EBF2FA;border:1.5px solid #2A5F8F;"></div> CloudFix Platform (AWS us-east-1)</div>
+            <div class="legend-item"><div class="legend-swatch" style="background:#EDFAF1;border:1.5px solid #28A745;"></div> Customer AWS Account</div>
+            <div class="legend-item"><div class="legend-swatch" style="background:#FFF3CD;border:1px solid #FFC107;"></div> Approval boundary</div>
+          </div>
+        </div>
+
+        <div class="callout callout-info" style="margin-top:20px;">
+          <strong>No customer AWS data passes through the service desk platform.</strong> Webhook payloads contain only CloudFix recommendation metadata: AWS resource IDs, estimated savings amounts, service type, and approval status. No S3 contents, database records, application data, or credentials are ever included.
+        </div>
+      </div>
+
+      <div class="cta-banner">
+        <h3>Need the diagrams in another format?</h3>
+        <p>Request a Visio, draw.io, or high-resolution PNG version for your security review pack.</p>
+        <button class="btn" data-open-modal>Request Diagram Files</button>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- Request Modal -->
+<div class="modal-overlay" id="request-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Request Security Documentation</h3>
+      <button class="modal-close" id="modal-close">&times;</button>
+    </div>
+    <div class="modal-body">
+      <form id="request-access-form">
+        <div class="form-group">
+          <label for="req-name">Full Name *</label>
+          <input type="text" id="req-name" name="name" required>
+        </div>
+        <div class="form-group">
+          <label for="req-company">Company *</label>
+          <input type="text" id="req-company" name="company" required>
+        </div>
+        <div class="form-group">
+          <label for="req-email">Work Email *</label>
+          <input type="email" id="req-email" name="email" required>
+        </div>
+        <div class="form-group">
+          <label for="req-need">What do you need?</label>
+          <select id="req-need" name="document_type">
+            <option value="">Select...</option>
+            <option value="architecture-diagram">Architecture Diagram (Visio / draw.io / PNG)</option>
+            <option value="soc2-type2">SOC 2 Type 2 Report</option>
+            <option value="penetration-test">Penetration Test Summary</option>
+            <option value="dpa">Data Processing Addendum (DPA)</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="req-message">Additional details</label>
+          <textarea id="req-message" name="message" rows="3"></textarea>
+        </div>
+        <div class="form-group" style="display:none;opacity:0;height:0;overflow:hidden;" aria-hidden="true">
+          <label for="req-website">Website</label>
+          <input type="text" id="req-website" name="website" tabindex="-1" autocomplete="off">
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;" id="req-submit-btn">Submit Request</button>
+        <p id="req-form-status" style="margin-top:8px;text-align:center;display:none;"></p>
+      </form>
+      <script>
+      (function(){
+        var form = document.getElementById("request-access-form");
+        if(!form) return;
+        form.addEventListener("submit", function(e){
+          e.preventDefault();
+          var btn = document.getElementById("req-submit-btn");
+          var st = document.getElementById("req-form-status");
+          btn.disabled = true; btn.textContent = "Submitting...";
+          var hp = document.getElementById("req-website"); if(hp && hp.value){btn.disabled=false;btn.textContent="Submit Request";return;}
+          fetch("https://automate.billgleeson.com/webhook/trust-center-contact", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({
+              _t: Math.floor(Date.now()/1000),
+              name: document.getElementById("req-name").value,
+              email: document.getElementById("req-email").value,
+              company: document.getElementById("req-company").value,
+              subject: "Doc Request: " + (document.getElementById("req-need").value || "General"),
+              message: document.getElementById("req-message").value || "(No additional details)"
+            })
+          }).then(function(r){
+            if(r.ok){
+              st.style.display="block"; st.style.color="#059669";
+              st.textContent="✓ Request submitted. We will respond within 2 business days.";
+              form.reset();
+            } else { throw new Error("err"); }
+          }).catch(function(){
+            st.style.display="block"; st.style.color="#dc2626";
+            st.textContent="Failed to submit. Please try the contact page.";
+          });
+          btn.disabled = false; btn.textContent = "Submit Request";
+        });
+      })();
+      </script>
+    </div>
+  </div>
+</div>
+
+<script src="js/main.js"></script>
+</body>
+</html>
