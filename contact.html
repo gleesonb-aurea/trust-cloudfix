@@ -160,13 +160,12 @@
             btn.disabled = true;
             btn.textContent = 'Sending...';
             try {
+              var honeypot = document.getElementById('contact-website');
+              if (honeypot && honeypot.value) { btn.disabled = false; btn.textContent = 'Send Message'; return; }
               const resp = await fetch('https://automate.billgleeson.com/webhook/trust-center-contact', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                // Honeypot check - bots fill hidden fields
-              var honeypot = document.getElementById('contact-website');
-              if (honeypot && honeypot.value) { btn.disabled = false; btn.textContent = 'Send Message'; return; }
-              body: JSON.stringify({
+                body: JSON.stringify({
                   _t: Math.floor(Date.now()/1000),
                   name: document.getElementById('contact-name').value,
                   email: document.getElementById('contact-email').value,
