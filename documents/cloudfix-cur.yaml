@@ -22,6 +22,11 @@ Parameters:
     Default: '2022-04-10'
     AllowedPattern: "^\\d{4}(-\\d{2}){2}"
     ConstraintDescription: Date and time of creation
+  AthenaBytesScannedCutoff:
+    Description: The upper data usage limit (cutoff) for the amount of bytes a single query in a workgroup is allowed to scan
+    Type: Number
+    Default: 1099511627776
+    ConstraintDescription: Must be between 10MB and 2TB
 Resources:
   # S3 bucket to deliver CUR data from AWS CE
   CostUsageBucket:
@@ -96,7 +101,7 @@ Resources:
           - Effect: Deny
             Principal: '*'
             Action: "s3:*"
-            Resource: 
+            Resource:
               - !Join
                 - ''
                 - - 'arn:aws:s3:::'
@@ -159,7 +164,7 @@ Resources:
         - Key: 'cloudfix:executionDate'
           Value: !Ref CreationDate
       WorkGroupConfiguration:
-        BytesScannedCutoffPerQuery: 1099511627776
+        BytesScannedCutoffPerQuery: !Ref AthenaBytesScannedCutoff
         EnforceWorkGroupConfiguration: false
         PublishCloudWatchMetricsEnabled: false
         RequesterPaysEnabled: true
@@ -220,8 +225,8 @@ Resources:
         - ''
         - - 'Clean_Up_Buckets'
           - !Ref ResourceSuffix
-      Description: LambdaFunction of python3.8 to perform Clean Up Buckets.
-      Runtime: python3.8
+      Description: LambdaFunction of python3.10 to perform Clean Up Buckets.
+      Runtime: python3.10
       Code:
         ZipFile: |
           #!/usr/bin/env python3
@@ -231,6 +236,7 @@ Resources:
             if event and event.get('ResponseURL'):
               cfnresponse.send(event, context, status, {}, reason=reason)
           def lambda_handler(event, context):
+            print("Event received:", event)
             try:
                 bucket = event['ResourceProperties']['BucketName']
 
@@ -288,7 +294,7 @@ Resources:
               - Action:
                   - glue:*
                 Effect: Allow
-                Resource: 
+                Resource:
                   - !Join
                     - ''
                     - - 'arn:aws:glue:'
@@ -318,7 +324,7 @@ Resources:
                   - s3:GetBucketAcl
                   - s3:GetBucketLocation
                 Effect: Allow
-                Resource: 
+                Resource:
                   - !Join
                     - ''
                     - - 'arn:aws:s3:::'
@@ -430,42 +436,30 @@ Resources:
     DependsOn: AWSCURCrawler
     Properties:
       Code:
-        ZipFile: >
-          const AWS = require('aws-sdk');
-          const response = require('./cfn-response');
-          exports.handler = function(event, context, callback) {
-            if (event.RequestType === 'Delete') {
-              response.send(event, context, response.SUCCESS);
-            } else {
-              const glue = new AWS.Glue();
-              glue.startCrawler({ Name: process.env.CUR_CRAWLER_NAME }, function(err, data) {
-                if (err) {
-                  const responseData = JSON.parse(this.httpResponse.body);
-                  if (responseData['__type'] == 'CrawlerRunningException') {
-                    callback(null, responseData.Message);
-                  } else {
-                    const responseString = JSON.stringify(responseData);
-                    if (event.ResponseURL) {
-                      response.send(event, context, response.FAILED,{ msg: responseString });
-                    } else {
-                      callback(responseString);
-                    }
-                  }
-                }
-                else {
-                  if (event.ResponseURL) {
-                    response.send(event, context, response.SUCCESS);
-                  } else {
-                    callback(null, response.SUCCESS);
-                  }
-                }
-              });
-            }
-          };
+        ZipFile: |
+          #!/usr/bin/env python3
+          import boto3
+          import cfnresponse
+          import os
+          
+          def return_response_to_cf(event, context, status, reason):
+            if event and event.get('ResponseURL'):
+              cfnresponse.send(event, context, status, {}, reason=reason)
+          
+          def handler(event, context):
+            print("Event received:", event)
+            if event.get('RequestType', '') == 'Delete':
+              return_response_to_cf(event, context, cfnresponse.SUCCESS, "Delete successful")
+            else:
+              glue = boto3.client('glue')
+              try:
+                glue.start_crawler(Name=os.environ['CUR_CRAWLER_NAME'])
+                return_response_to_cf(event, context, cfnresponse.SUCCESS, "Create successful")
+              except Exception as e:
+                return_response_to_cf(event, context, cfnresponse.FAILED, str(e))
       Handler: 'index.handler'
       Timeout: 30
-      Runtime: nodejs16.x
-      ReservedConcurrentExecutions: 1
+      Runtime: python3.10
       Role: !GetAtt AWSCURCrawlerLambdaExecutor.Arn
       Environment:
         Variables:
@@ -539,57 +533,56 @@ Resources:
       - AWSS3CUREventLambdaPermission
     Properties:
       Code:
-        ZipFile: >
-          const AWS = require('aws-sdk');
-          const response = require('./cfn-response');
-          exports.handler = function(event, context, callback) {
-            const s3 = new AWS.S3();
-            const putConfigRequest = function(notificationConfiguration) {
-              return new Promise(function(resolve, reject) {
-                s3.putBucketNotificationConfiguration({
-                  Bucket: event.ResourceProperties.BucketName,
-                  NotificationConfiguration: notificationConfiguration
-                }, function(err, data) {
-                  if (err) reject({ msg: this.httpResponse.body.toString(), error: err, data: data });
-                  else resolve(data);
-                });
-              });
-            };
-            const newNotificationConfig = {};
-            if (event.RequestType !== 'Delete') {
-              newNotificationConfig.LambdaFunctionConfigurations = [{
-                Events: [ 's3:ObjectCreated:*' ],
-                LambdaFunctionArn: event.ResourceProperties.TargetLambdaArn || 'missing arn',
-                Filter: { Key: { FilterRules: [ { Name: 'prefix', Value: event.ResourceProperties.ReportKey } ] } }
-              }];
-            }
-            if (event.RequestType === 'Create') {
-              const support = new AWS.Support();
-              const params = {
-                communicationBody: 'We need recently created CUR report named CloudFix-CUR to contain the data from the last 3 calendar months. Could you backfill the data for CloudFix-CUR?',
-                subject: 'Backfill CUR data',
-                categoryCode: 'invoices-and-reports',
-                ccEmailAddresses: [],
-                serviceCode: 'billing',
-                severityCode: 'high'
-              };
-              support.createCase(params, function(err, data) {
-                if (err) console.log(err, err.stack); // an error occurred
-                else     console.log(data);           // successful response
-              });
-            }
-            putConfigRequest(newNotificationConfig).then(function(result) {
-              response.send(event, context, response.SUCCESS, result);
-              callback(null, result);
-            }).catch(function(error) {
-              response.send(event, context, response.FAILED, error);
-              console.log(error);
-              callback(error);
-            });
-          };
+        ZipFile: |
+          #!/usr/bin/env python3
+          import boto3
+          import cfnresponse
+          def handler(event, context):
+              print("Event received:", event)
+              s3 = boto3.client('s3')
+              def put_config_request(notification_configuration):
+                  try:
+                      response = s3.put_bucket_notification_configuration(
+                          Bucket=event['ResourceProperties']['BucketName'],
+                          NotificationConfiguration=notification_configuration
+                      )
+                      return response
+                  except Exception as e:
+                      return {'message': str(e), 'error': e}
+
+              new_notification_config = {}
+              if event['RequestType'] != 'Delete':
+                  new_notification_config['LambdaFunctionConfigurations'] = [{
+                      'Events': ['s3:ObjectCreated:*'],
+                      'LambdaFunctionArn': event['ResourceProperties'].get('TargetLambdaArn', 'missing arn'),
+                      'Filter': {'Key': {'FilterRules': [{'Name': 'prefix', 'Value': event['ResourceProperties']['ReportKey']}]}},
+                  }]
+
+              if event['RequestType'] == 'Create':
+                  support = boto3.client('support')
+                  params = {
+                      'communicationBody': 'We need recently created CUR report named CloudFix-CUR to contain the data from the last 3 calendar months. Could you backfill the data for CloudFix-CUR?',
+                      'subject': 'Backfill CUR data',
+                      'categoryCode': 'invoices-and-reports',
+                      'ccEmailAddresses': [],
+                      'serviceCode': 'billing',
+                      'severityCode': 'high'
+                  }
+                  try:
+                      data = support.create_case(**params)
+                      print(data)
+                  except Exception as e:
+                      print(e, e.__traceback__)
+
+              try:
+                  result = put_config_request(new_notification_config)
+                  cfnresponse.send(event, context, cfnresponse.SUCCESS, result)
+              except Exception as error:
+                  cfnresponse.send(event, context, cfnresponse.FAILED, {'message': str(error), 'error': error})
+                  print(error)
       Handler: 'index.handler'
       Timeout: 30
-      Runtime: nodejs16.x
+      Runtime: python3.10
       ReservedConcurrentExecutions: 1
       Role: !GetAtt AWSS3CURLambdaExecutor.Arn
   # Custom resource to notify S3 CUR update

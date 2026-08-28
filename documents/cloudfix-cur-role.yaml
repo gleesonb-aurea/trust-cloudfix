@@ -115,8 +115,11 @@ Resources:
 # CloudFix do not have permission to update CloudFix cloudformation templates.
 # Parent CF (https://cloudfix-templates.s3.amazonaws.com/cloudfix-onboarding.yaml) installs StackSet without any target deployment
 # CreateStackInstances permission is required to onboard OUs (Organizational Units) from CloudFix UI
+# List/DeleteStackInstances permissions are required to offboard excluded accounts (remove their CloudFix stacks)
                 - Action:
                     - 'cloudformation:CreateStackInstances'
+                    - 'cloudformation:ListStackInstances'
+                    - 'cloudformation:DeleteStackInstances'
                     - 'cloudformation:DescribeStackSetOperation'
                   Effect: Allow
                   Resource:
@@ -130,8 +133,13 @@ Resources:
                       - - 'arn:aws:cloudformation:*:'
                         - !Ref 'AWS::AccountId'
                         - ':stackset/*CloudFixOrgStackSet*'
+# Stack-instance create/delete of a StackSet whose template contains these resource types is authorized
+# against the resource-type ARNs below in addition to the stackset/stackset-target ARNs in the preceding
+# statement, so DeleteStackInstances must be listed here too (alongside CreateStackInstances) to offboard
+# excluded accounts whose stacks provision IAM roles.
                 - Action:
                     - 'cloudformation:CreateStackInstances'
+                    - 'cloudformation:DeleteStackInstances'
                   Effect: Allow
                   Resource:
                     - 'arn:aws:cloudformation:us-east-1::type/resource/AWS-IAM-Role'

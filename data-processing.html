@@ -319,7 +319,7 @@
         </div>
 
         <div class="callout callout-info" style="margin-top:12px;">
-          <strong>No application data, S3 object contents, database records, or business data</strong> is accessed or transferred by CloudFix. CloudFix reads only AWS infrastructure metadata (resource IDs, configuration, cost/usage metrics).
+          <strong>No application data or business data is transferred to the ITSM platform</strong> — outbound payloads carry recommendation metadata only. Within your AWS account, CloudFix reads primarily infrastructure metadata (resource IDs, configuration, cost/usage metrics); a small number of finders require targeted reads beyond that, each granted only when the corresponding finder is enabled. See <a href="security.html#iam-roles">the finder role permission model</a> for detail.
         </div>
       </div>
 
@@ -328,7 +328,7 @@
         <h2>How Data Is Processed</h2>
 
         <h3>Data Collection</h3>
-        <p>CloudFix accesses your AWS data through a read-only IAM role created by a CloudFormation StackSet that you deploy. The finder role performs only <code>Describe</code>, <code>List</code>, and <code>Get</code> actions — no write operations.</p>
+        <p>CloudFix accesses your AWS data through an IAM role created by a CloudFormation StackSet that you deploy. The finder role is read-oriented: the overwhelming majority of its permissions are <code>Describe</code>, <code>List</code>, and <code>Get</code> actions. It also holds a small set of non-destructive write permissions needed for normal operation — resource tagging (<code>ec2:CreateTags</code>, <code>ec2:DeleteTags</code>, <code>tag:TagResource</code>), CloudWatch Logs writes, Athena queries, and SNS notifications. The complete action list is published in the <a href="security.html#templates">CloudFormation templates</a>.</p>
 
         <h3>Data Analysis</h3>
         <p>Cost and Usage Reports are queried via Amazon Athena and processed in-memory for analysis. Results (optimization recommendations) are stored in CloudFix's database. Raw CUR data is not stored long-term.</p>

@@ -244,7 +244,7 @@
             <text x="680" y="400" text-anchor="middle" fill="#495057" font-size="10">Redshift · OpenSearch · S3</text>
             <text x="680" y="420" text-anchor="middle" fill="#868E96" font-size="10">Modified only after explicit</text>
             <text x="680" y="434" text-anchor="middle" fill="#868E96" font-size="10">approval via SSM</text>
-            <text x="680" y="474" text-anchor="middle" fill="#28A745" font-size="10" font-weight="600">No app data accessed</text>
+            <text x="680" y="474" text-anchor="middle" fill="#28A745" font-size="10" font-weight="600">No broad data access</text>
 
             <!-- ── Arrows ── -->
             <!-- User → Dashboard -->
@@ -285,11 +285,18 @@
             <text x="548" y="446" text-anchor="middle" fill="#28A745" font-size="10">Execute</text>
 
           </svg>
-          <p class="diagram-caption">Figure 1 — CloudFix core architecture. Data flows left (CloudFix platform) ↔ right (customer AWS account). No application data is accessed; only infrastructure metadata.</p>
+          <p class="diagram-caption">Figure 1 — CloudFix core architecture. Data flows left (CloudFix platform) ↔ right (customer AWS account). CloudFix reads primarily infrastructure metadata; see the security page for the finder role's full permission model.</p>
           <div class="diagram-legend">
             <div class="legend-item"><div class="legend-swatch" style="background:#EBF2FA;border:1.5px solid #2A5F8F;"></div> CloudFix Platform (AWS us-east-1)</div>
             <div class="legend-item"><div class="legend-swatch" style="background:#EDFAF1;border:1.5px solid #28A745;"></div> Customer AWS Account</div>
             <div class="legend-item"><div class="legend-swatch" style="background:#FFF3CD;border:1px solid #FFC107;"></div> Approval boundary — customer must approve before fixes execute</div>
+          </div>
+          <div class="callout" style="margin-top:20px;">
+            <strong>Role detail behind the approval boundary.</strong> Three roles participate in remediation.
+            <code>cloudfix-ssm-update-role</code> is assumable by the CloudFix platform and is what authors the SSM document and raises the change request — it cannot modify your resources beyond tagging.
+            <code>cloudfix-fixer-approver-role</code>, which approves change templates, trusts your account root only in the default deployment (opting into centralized approval additionally trusts CloudFix under an <code>sts:ExternalId</code> condition).
+            <code>cloudfix-ssm-assumed-role</code>, which performs the change, is invoked by AWS Systems Manager and is not assumable by CloudFix.
+            Full trust policies and action lists are in the <a href="security.html#iam-roles">IAM Role Architecture</a> section and the published CloudFormation templates.
           </div>
         </div>
       </div>
@@ -446,7 +453,7 @@
             <text x="777" y="371" text-anchor="middle" fill="#495057" font-size="10">ElastiCache · S3 · Lambda…</text>
             <text x="777" y="395" text-anchor="middle" fill="#868E96" font-size="10">Modified only after</text>
             <text x="777" y="409" text-anchor="middle" fill="#868E96" font-size="10">approved changes</text>
-            <text x="777" y="432" text-anchor="middle" fill="#28A745" font-size="10" font-weight="600">No app data accessed</text>
+            <text x="777" y="432" text-anchor="middle" fill="#28A745" font-size="10" font-weight="600">No broad data access</text>
 
             <!-- ── Arrows ── -->
             <!-- CF webhook → ITSM inbound -->

@@ -101,7 +101,7 @@
           <div class="card stat-card">
             <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="#1B3A5C" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/><circle cx="12" cy="16" r="1"/></svg>
             <div class="stat-label">Data Access</div>
-            <div class="stat-value">Read-only IAM role, no write access to your infrastructure</div>
+            <div class="stat-value">Read-oriented IAM role; no infrastructure changes without your approval</div>
           </div>
           <div class="card stat-card">
             <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="#1B3A5C" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
@@ -129,7 +129,7 @@
       <!-- Key Platform Stats -->
       <div class="section">
         <h2>Platform Overview</h2>
-        <p>CloudFix provides fully automated AWS cost optimization. Our platform identifies savings opportunities through 75+ purpose-built finders spanning more than 30 AWS services, then implements approved fixes via AWS SSM Automation — all with read-only access and customer-controlled execution.</p>
+        <p>CloudFix provides fully automated AWS cost optimization. Our platform identifies savings opportunities through 75+ purpose-built finders spanning more than 30 AWS services, then implements approved fixes via AWS SSM Automation — discovery is read-oriented, and execution is customer-controlled.</p>
         <div class="highlight-box" style="margin-top:20px;">
           <ul style="margin:0; display:grid; grid-template-columns:repeat(auto-fill, minmax(200px,1fr)); gap:8px;">
             <li><strong>$2B+</strong> AWS spend analyzed</li>
@@ -145,10 +145,10 @@
       <!-- How It Works -->
       <div class="section">
         <h2>How CloudFix Works</h2>
-        <p>CloudFix connects to your AWS account through a CloudFormation StackSet that creates carefully scoped IAM roles. Customer data is accessed through a read-oriented finder role — no write actions are ever performed without your explicit approval of change templates executed through AWS Systems Manager Change Manager and Automation runbooks.</p>
+        <p>CloudFix connects to your AWS account through a CloudFormation StackSet that creates carefully scoped IAM roles. Discovery runs through a read-oriented finder role whose only write permissions are resource tagging, CloudWatch Logs, Athena queries, and SNS notifications. No change is made to your infrastructure without your explicit approval of a change template, executed through AWS Systems Manager Change Manager and Automation runbooks inside your own account.</p>
 
         <div class="callout callout-success" style="margin-top:16px;">
-          <strong>Key principle:</strong> The fixer role is created by CloudFix but <strong>cannot be assumed or accessed by CloudFix</strong>. You retain full control over all changes to your infrastructure.
+          <strong>Key principle:</strong> The role that executes fixes (<code>cloudfix-ssm-assumed-role</code>) is created by CloudFix but <strong>cannot be assumed or accessed by CloudFix</strong> — it is invoked only by AWS Systems Manager inside your account. In the default deployment the approver role trusts your account alone, so approval is the control boundary and it stays with you.
         </div>
       </div>
 

@@ -125,7 +125,7 @@
       <div class="section">
         <h2>Data We Don't Collect</h2>
         <div class="callout callout-success" style="margin-top:0;">
-          <strong>CloudFix never has access to your AWS credentials or application data.</strong> We use IAM role assumption with read-only permissions.
+          <strong>CloudFix never has access to your AWS credentials.</strong> We use IAM role assumption (STS AssumeRole) rather than stored credentials, and the discovery role's permissions are read-oriented — its only writes are resource tagging, CloudWatch Logs, Athena queries, and SNS notifications.
         </div>
         <div class="card-grid" style="margin-top:16px;">
           <div class="card">
@@ -133,8 +133,8 @@
             <p>No secret keys, access keys, or passwords are ever stored or transmitted to CloudFix. Access is via IAM role assumption only.</p>
           </div>
           <div class="card">
-            <h3 style="margin-top:0; color:#DC3545;">⛔ No Application Data</h3>
-            <p>No application content, databases, logs, or payloads from your AWS environments are accessed. Only resource metadata and cost data.</p>
+            <h3 style="margin-top:0; color:#DC3545;">⛔ No Bulk Data Access</h3>
+            <p>CloudFix cannot read your secrets, Parameter Store values, log events, database items, queue messages, or snapshot contents. Analysis is based on resource metadata and cost data; a small number of finders require narrow, purpose-specific reads, granted only when that finder is enabled. See <a href="security.html#iam-roles">the permission model</a>.</p>
           </div>
           <div class="card">
             <h3 style="margin-top:0; color:#DC3545;">⛔ No PII from AWS</h3>
