@@ -1,3 +1,9 @@
+# Local/private material — never publish.
+# wrangler.jsonc serves the repo root as static assets ("assets": {"directory": "."}),
+# so anything committed here becomes publicly reachable on trust.cloudfix.com.
+private/
+.envrc
+
 # wrangler files
 .wrangler
 .dev.vars*
