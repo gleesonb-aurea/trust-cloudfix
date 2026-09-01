@@ -125,7 +125,7 @@
       <div class="section">
         <h2>Data We Don't Collect</h2>
         <div class="callout callout-success" style="margin-top:0;">
-          <strong>CloudFix never has access to your AWS credentials.</strong> We use IAM role assumption (STS AssumeRole) rather than stored credentials, and the discovery role's permissions are read-oriented — its only writes are resource tagging, CloudWatch Logs, Athena queries, and SNS notifications.
+          <strong>CloudFix never has access to your AWS credentials.</strong> We use IAM role assumption (STS AssumeRole) rather than stored credentials, and the discovery role's permissions are read-oriented — its writes are limited to resource tagging, query execution, and a small number of finder-specific actions granted only when the finder that needs them is entitled — all of them <a href="security.html#iam-roles">enumerated on the security page</a>.
         </div>
         <div class="card-grid" style="margin-top:16px;">
           <div class="card">
@@ -169,7 +169,7 @@
               </tr>
               <tr>
                 <td>Audit logs</td>
-                <td>Retained for 1 year</td>
+                <td>Retained for 1 year, or until 30 days after contract termination, whichever comes first</td>
               </tr>
               <tr>
                 <td>Fix execution history</td>
@@ -200,8 +200,18 @@
                 <td>US-East (us-east-1)</td>
               </tr>
               <tr>
-                <td>Cloudflare</td>
-                <td>CDN, DNS, DDoS protection</td>
+                <td>Amazon CloudFront</td>
+                <td>CDN and SSL termination for the CloudFix dashboard &mdash; part of AWS infrastructure, not a separate third party</td>
+                <td>Global edge network</td>
+              </tr>
+              <tr>
+                <td>Amazon Route 53</td>
+                <td>DNS for the CloudFix dashboard &mdash; part of AWS infrastructure, not a separate third party</td>
+                <td>Global anycast network</td>
+              </tr>
+              <tr>
+                <td>AWS Shield</td>
+                <td>DDoS protection &mdash; part of AWS infrastructure, not a separate third party</td>
                 <td>Global edge network</td>
               </tr>
               <tr>

@@ -51,80 +51,283 @@ Resources:
         - PolicyDocument:
             Statement:
               - Action:
-                  - 'cloudfront:GetCachePolicy'
-                  - 'cloudfront:GetDistributionConfig'
-                  - 'cloudtrail:DescribeTrails'
-                  - 'cloudtrail:GetEventSelectors'
-                  - 'cloudtrail:GetInsightSelectors'
-                  - 'cloudtrail:GetTrailStatus'
-                  - 'cloudtrail:ListTrails'
-                  - 'cloudtrail:LookupEvents'
-                  - 'cloudwatch:GetMetricData'
-                  - 'cloudwatch:GetMetricStatistics'
-                  - 'cloudwatch:ListMetrics'
-                  - 'compute-optimizer:GetEC2InstanceRecommendations'
-                  - 'compute-optimizer:GetEnrollmentStatus'
-                  - 'dms:DescribeReplicationInstances'
-                  - 'dms:DescribeReplicationTasks'
-                  - 'dms:ListTagsForResource'
-                  - 'dynamodb:DescribeTable'
-                  - 'ebs:ListChangedBlocks'
-                  - 'ebs:ListSnapshotBlocks'
-                  - 'ec2:CreateTags'
-                  - 'ec2:DeleteTags'
-                  - 'ec2:DescribeAddresses'
-                  - 'ec2:DescribeAddressesAttribute'
-                  - 'ec2:DescribeFastSnapshotRestores'
-                  - 'ec2:DescribeImages'
-                  - 'ec2:DescribeInstanceAttribute'
-                  - 'ec2:DescribeInstanceStatus'
-                  - 'ec2:DescribeInstanceTypes'
-                  - 'ec2:DescribeInstances'
-                  - 'ec2:DescribeNatGateWays'
-                  - 'ec2:DescribeNatGateways'
-                  - 'ec2:DescribeRegions'
-                  - 'ec2:DescribeRouteTables'
-                  - 'ec2:DescribeSnapshotAttribute'
-                  - 'ec2:DescribeSnapshots'
-                  - 'ec2:DescribeSubnets'
-                  - 'ec2:DescribeVolumes'
-                  - 'ec2:DescribeVpcAttribute'
-                  - 'ec2:DescribeVpcEndpoints'
-                  - 'ec2:DescribeVpcs'
-                  - 'ec2:GetLaunchTemplateData'
-                  - 'elasticache:DescribeCacheClusters'
-                  - 'elasticfilesystem:DescribeFileSystems'
-                  - 'elasticfilesystem:DescribeLifecycleConfiguration'
-                  - 'elasticloadbalancing:DescribeLoadBalancers'
-                  - 'es:DescribeDomain'
-                  - 'es:DescribeDomainChangeProgress'
-                  - 'es:DescribeDomains'
-                  - 'iam:GetInstanceProfile'
-                  - 'iam:ListAttachedRolePolicies'
-                  - 'iam:ListInstanceProfilesForRole'
-                  - 'kendra:DescribeDataSource'
-                  - 'kendra:DescribeIndex'
-                  - 'kendra:ListDataSources'
-                  - 'pricing:GetProducts'
-                  - 'quicksight:ListUsers'
-                  - 'quicksight:SearchAnalyses'
-                  - 'quicksight:SearchDashboards'
-                  - 'quicksight:SearchDataSets'
-                  - 'quicksight:SearchDataSources'
-                  - 'rds:DescribeDBClusters'
-                  - 'rds:DescribeDBInstances'
-                  - 'rds:DescribeOrderableDBInstanceOptions'
-                  - 'route53:ListHostedZones'
-                  - 'route53:ListResourceRecordSets'
-                  - 's3:GetLifecycleConfiguration'
-                  - 's3:ListAllMyBuckets'
-                  - 'ssm:ListAssociations'
-                  - 'tag:TagResource'
+                  - aoss:ListCollections
+                  - aoss:ListTagsForResource
+                  - application-autoscaling:DescribeScalableTargets
+                  - application-autoscaling:DescribeScalingPolicies
+                  - athena:GetQueryExecution
+                  - athena:GetQueryResults
+                  - athena:StartQueryExecution
+                  - autoscaling:DescribeAutoScalingGroups
+                  - autoscaling:DescribeLaunchConfigurations
+                  - autoscaling:DescribeTags
+                  - backup:DescribeRecoveryPoint
+                  - backup:GetBackupPlan
+                  - backup:GetBackupSelection
+                  - backup:ListBackupPlans
+                  - backup:ListBackupSelections
+                  - backup:ListBackupVaults
+                  - backup:ListRecoveryPointsByBackupVault
+                  - backup:ListTags
+                  - bedrock:GetModelInvocationLoggingConfiguration
+                  - bedrock:InvokeModel
+                  - bedrock:ListCustomModels
+                  - bedrock:ListFoundationModels
+                  - cassandra:Select
+                  - ce:GetCommitmentPurchaseAnalysis
+                  - ce:GetCostAndUsage
+                  - ce:GetCostForecast
+                  - ce:GetReservationPurchaseRecommendation
+                  - ce:GetReservationUtilization
+                  - ce:GetSavingsPlansPurchaseRecommendation
+                  - ce:ListCommitmentPurchaseAnalyses
+                  - ce:StartCommitmentPurchaseAnalysis
+                  - cloudformation:DescribeStackResources
+                  - cloudformation:ListStacks
+                  - cloudfront:GetCachePolicy
+                  - cloudfront:GetDistributionConfig
+                  - cloudfront:ListDistributions
+                  - cloudfront:ListTagsForResource
+                  - cloudtrail:DescribeEventDataStore
+                  - cloudtrail:DescribeTrails
+                  - cloudtrail:GetEventDataStore
+                  - cloudtrail:GetEventSelectors
+                  - cloudtrail:GetInsightSelectors
+                  - cloudtrail:GetTrailStatus
+                  - cloudtrail:ListEventDataStores
+                  - cloudtrail:listTags
+                  - cloudtrail:ListTags
+                  - cloudtrail:ListTrails
+                  - cloudtrail:LookupEvents
+                  - cloudwatch:DescribeAlarmHistory
+                  - cloudwatch:DescribeAlarms
+                  - cloudwatch:GetMetricData
+                  - cloudwatch:GetMetricStatistics
+                  - cloudwatch:ListMetrics
+                  - compute-optimizer:GetEBSVolumeRecommendations
+                  - compute-optimizer:GetEC2InstanceRecommendations
+                  - compute-optimizer:GetEC2RecommendationProjectedMetrics
+                  - compute-optimizer:GetECSServiceRecommendations
+                  - compute-optimizer:GetEnrollmentStatus
+                  - compute-optimizer:GetLicenseRecommendations
+                  - compute-optimizer:GetRDSDatabaseRecommendationProjectedMetrics
+                  - dms:DescribeReplicationInstances
+                  - dms:DescribeReplicationTasks
+                  - dms:ListTagsForResource
+                  - dynamodb:DescribeContinuousBackups
+                  - dynamodb:DescribeTable
+                  - dynamodb:ListTables
+                  - dynamodb:ListTagsOfResource
+                  - ebs:ListChangedBlocks
+                  - ebs:ListSnapshotBlocks
+                  - ec2:CreateTags
+                  - ec2:DeleteTags
+                  - ec2:DescribeAddresses
+                  - ec2:DescribeAddressesAttribute
+                  - ec2:DescribeFastSnapshotRestores
+                  - ec2:DescribeImageAttribute
+                  - ec2:DescribeImages
+                  - ec2:DescribeInstanceAttribute
+                  - ec2:DescribeInstances
+                  - ec2:DescribeInstanceStatus
+                  - ec2:DescribeInstanceTypeOfferings
+                  - ec2:DescribeInstanceTypes
+                  - ec2:DescribeLaunchTemplateVersions
+                  - ec2:DescribeNatGateWays
+                  - ec2:DescribeNatGateways
+                  - ec2:DescribeRegions
+                  - ec2:DescribeReservedInstances
+                  - ec2:DescribeRouteTables
+                  - ec2:DescribeSnapshotAttribute
+                  - ec2:DescribeSnapshots
+                  - ec2:DescribeSpotPriceHistory
+                  - ec2:DescribeSubnets
+                  - ec2:DescribeTags
+                  - ec2:DescribeTransitGatewayAttachments
+                  - ec2:DescribeVolumes
+                  - ec2:DescribeVpcAttribute
+                  - ec2:DescribeVpcEndpoints
+                  - ec2:DescribeVpcs
+                  - ec2:GetInstanceTypesFromInstanceRequirements
+                  - ec2:GetLaunchTemplateData
+                  - ecs:DescribeCapacityProviders
+                  - ecs:DescribeClusters
+                  - ecs:DescribeServices
+                  - ecs:DescribeTaskDefinition
+                  - ecs:DescribeTasks
+                  - ecs:ListClusters
+                  - ecs:ListContainerInstances
+                  - ecs:ListServices
+                  - ecs:ListTagsForResource
+                  - ecs:ListTasks
+                  - eks:DescribeCluster
+                  - eks:DescribeInsight
+                  - eks:ListClusters
+                  - eks:ListInsights
+                  - eks:ListTagsForResource
+                  - elasticache:DescribeCacheClusters
+                  - elasticache:DescribeReplicationGroups
+                  - elasticache:DescribeReservedCacheNodes
+                  - elasticache:DescribeServerlessCaches
+                  - elasticache:DescribeServerlessCacheSnapshots
+                  - elasticache:DescribeSnapshots
+                  - elasticache:ListAllowedNodeTypeModifications
+                  - elasticache:ListTagsForResource
+                  - elasticfilesystem:DescribeFileSystems
+                  - elasticfilesystem:DescribeLifecycleConfiguration
+                  - elasticfilesystem:ListTagsForResource
+                  - elasticloadbalancing:DescribeLoadBalancers
+                  - elasticloadbalancing:DescribeTags
+                  - elasticloadbalancing:DescribeTargetGroups
+                  - elasticmapreduce:DescribeCluster
+                  - elasticmapreduce:GetManagedScalingPolicy
+                  - elasticmapreduce:ListClusters
+                  - elasticmapreduce:ListInstanceGroups
+                  - elasticmapreduce:ListInstances
+                  - emr:DescribeCluster
+                  - es:DescribeDomain
+                  - es:DescribeDomainChangeProgress
+                  - es:DescribeDomains
+                  - es:ListDomainNames
+                  - es:ListTags
+                  - events:ListRules
+                  - fsx:DescribeBackups
+                  - fsx:DescribeFileCaches
+                  - fsx:DescribeFileSystems
+                  - fsx:DescribeSnapshots
+                  - fsx:DescribeVolumes
+                  - glue:GetCatalogs
+                  - glue:GetSecurityConfigurations
+                  - glue:SearchTables
+                  - iam:GetInstanceProfile
+                  - iam:ListAttachedRolePolicies
+                  - iam:ListInstanceProfilesForRole
+                  - iam:ListRoles
+                  - kafka:DescribeCluster
+                  - kafka:DescribeClusterV2
+                  - kafka:ListClusters
+                  - kafka:ListClustersV2
+                  - kendra:DescribeDataSource
+                  - kendra:DescribeIndex
+                  - kendra:ListDataSources
+                  - kendra:ListTagsForResource
+                  - kinesis:DescribeAccountSettings
+                  - kinesisanalytics:DescribeApplication
+                  - kinesisanalytics:ListTagsForResource
+                  - kms:DescribeKey
+                  - kms:ListKeys
+                  - lambda:GetFunction
+                  - lambda:GetLayerVersion
+                  - lambda:InvokeFunction
+                  - lambda:ListAliases
+                  - lambda:ListProvisionedConcurrencyConfigs
+                  - lambda:ListVersionsByFunction
+                  - logs:DescribeLogGroups
+                  - logs:GetQueryResults
+                  - logs:ListTagsForResource
+                  - logs:StartQuery
+                  - memorydb:DescribeClusters
+                  - memorydb:DescribeReservedNodes
+                  - memorydb:ListTags
+                  - mq:DescribeBroker
+                  - mq:ListBrokers
+                  - networkmanager:GetRouteAnalysis
+                  - networkmanager:StartRouteAnalysis
+                  - pricing:GetAttributeValues
+                  - pricing:GetProducts
+                  - qldb:DescribeLedger
+                  - qldb:ListLedgers
+                  - quicksight:ListTagsForResource
+                  - quicksight:ListUsers
+                  - quicksight:SearchAnalyses
+                  - quicksight:SearchDashboards
+                  - quicksight:SearchDataSets
+                  - quicksight:SearchDataSources
+                  - rds:DescribeDBClusters
+                  - rds:DescribeDBClusterSnapshots
+                  - rds:DescribeDBInstances
+                  - rds:DescribeDBSnapshots
+                  - rds:DescribeGlobalClusters
+                  - rds:DescribeOrderableDBInstanceOptions
+                  - rds:DescribeReservedDBInstances
+                  - rds:ListTagsForResource
+                  - redshift-serverless:ListNamespaces
+                  - redshift-serverless:ListSnapshots
+                  - redshift:DescribeClusters
+                  - redshift:DescribeClusterSnapshots
+                  - redshift:DescribeNodeConfigurationOptions
+                  - route53:ListHostedZones
+                  - route53:ListResourceRecordSets
+                  - s3:GetBucketIntelligentTieringConfiguration
+                  - s3:GetBucketLifecycleConfiguration
+                  - s3:GetBucketLocation
+                  - s3:GetBucketObjectLockConfiguration
+                  - s3:GetBucketTagging
+                  - s3:GetEncryptionConfiguration
+                  - s3:GetInventoryConfiguration
+                  - s3:GetLifecycleConfiguration
+                  - s3:GetObject
+                  - s3:ListAllMyBuckets
+                  - s3:ListBucketIntelligentTieringConfigurations
+                  - s3:ListBucketInventoryConfigurations
+                  - s3:PutObject
+                  - sagemaker:DescribeEndpoint
+                  - sagemaker:DescribeEndpointConfig
+                  - sagemaker:DescribeTransformJob
+                  - sagemaker:ListApps
+                  - sagemaker:ListEndpointConfigs
+                  - sagemaker:ListEndpoints
+                  - sagemaker:ListModels
+                  - sagemaker:ListNotebookInstances
+                  - sagemaker:ListProcessingJobs
+                  - sagemaker:ListTrainingJobs
+                  - sagemaker:ListTransformJobs
+                  - secretsmanager:ListSecrets
+                  - servicequotas:GetServiceQuota
+                  - sns:GetTopicAttributes
+                  - sns:ListTopics
+                  - sqs:GetQueueAttributes
+                  - sqs:ListQueues
+                  - ssm:DescribeAssociation
+                  - ssm:DescribeInstanceInformation
+                  - ssm:DescribeParameters
+                  - ssm:GetCommandInvocation
+                  - ssm:GetDocument
+                  - ssm:ListAssociations
+                  - ssm:ListTagsForResource
+                  - ssm:SendCommand
+                  - states:DescribeStateMachine
+                  - states:ListStateMachines
+                  - tag:TagResources
+                  - timestream:DescribeTable
+                  - timestream:ListDatabases
+                  - timestream:ListTables
+                  - transfer:DescribeServer
                 Effect: Allow
                 Resource: '*'
             Version: 2012-10-17
           PolicyName: core
-
+        - PolicyDocument:
+            Statement:
+              - Action:
+                  - 'backup:TagResource'
+                  - 'cloudfront:TagResource'
+                  - 'dlm:TagResource'
+                  - 'dynamodb:TagResource'
+                  - 'ec2:CreateTags'
+                  - 'ec2:DeleteTags'
+                  - 'elasticfilesystem:CreateTags'
+                  - 'rds:AddTagsToResource'
+                  - 'elasticfilesystem:TagResource'
+                  - 'rbin:TagResource'
+                  - 'tag:GetResources'
+                  - 'tag:TagResources'
+                  - 'elasticmapreduce:AddTags'
+                Effect: Allow
+                Resource: '*'
+                Condition: { "ForAllValues:StringLike": { "aws:TagKeys": ["cloudfix:*","CloudFix:*"] } }
+            Version: 2012-10-17
+          PolicyName: tagging
         - PolicyDocument:
             Statement:
               - Action:
@@ -194,9 +397,247 @@ Resources:
                     - !Ref 'AWS::AccountId'
                     - ':role/cloudfix-ssm-assumed-role'
                     - !Ref ResourceSuffix
-
+              - Action:
+                  - athena:GetQueryExecution
+                  - athena:StartQueryExecution
+                  - autoscaling:CreateOrUpdateTags
+                  - autoscaling:DeleteTags
+                  - autoscaling:DescribeAutoScalingGroups
+                  - autoscaling:DescribeLaunchConfigurations
+                  - autoscaling:DescribeTags
+                  - autoscaling:UpdateAutoScalingGroup
+                  - backup:DeleteRecoveryPoint
+                  - backup:DescribeBackupJob
+                  - backup:StartBackupJob
+                  - backup:UpdateRegionSettings
+                  - bedrock:GetModelInvocationLoggingConfiguration
+                  - bedrock:PutModelInvocationLoggingConfiguration
+                  - cloudfront:CreateCachePolicy
+                  - cloudfront:GetCachePolicy
+                  - cloudfront:GetCachePolicyConfig
+                  - cloudfront:GetDistributionConfig
+                  - cloudfront:ListCachePolicies
+                  - cloudfront:TagResource
+                  - cloudfront:UpdateCachePolicy
+                  - cloudfront:UpdateDistribution
+                  - cloudtrail:GetEventDataStore
+                  - cloudtrail:GetEventSelectors
+                  - cloudtrail:GetTrailStatus
+                  - cloudtrail:StopLogging
+                  - cloudtrail:UpdateEventDataStore
+                  - cloudwatch:DeleteAlarms
+                  - cloudwatch:DescribeAlarms
+                  - cloudwatch:PutMetricAlarm
+                  - compute-optimizer:GetRDSDatabaseRecommendationProjectedMetrics
+                  - compute-optimizer:UpdateEnrollmentStatus
+                  - dms:CreateReplicationInstance
+                  - dms:CreateReplicationTask
+                  - dms:DeleteReplicationInstance
+                  - dms:DeleteReplicationTask
+                  - dms:DescribeReplicationInstances
+                  - dynamodb:DeleteTable
+                  - dynamodb:DescribeTable
+                  - dynamodb:TagResource
+                  - dynamodb:UpdateTable
+                  - ec2-instance-connect:SendSSHPublicKey
+                  - ec2:AssociateIamInstanceProfile
+                  - ec2:CreateLaunchTemplate
+                  - ec2:CreateNetworkInterface
+                  - ec2:CreateRoute
+                  - ec2:CreateSecurityGroup
+                  - ec2:CreateSnapshot
+                  - ec2:CreateSnapshots
+                  - ec2:CreateTags
+                  - ec2:CreateVpcEndpoint
+                  - ec2:DeleteLaunchTemplate
+                  - ec2:DeleteNatGateway
+                  - ec2:DeleteNetworkInterface
+                  - ec2:DeleteSecurityGroup
+                  - ec2:DeleteSnapshot
+                  - ec2:DeleteVolume
+                  - ec2:DeleteVpcEndpoints
+                  - ec2:DeleteVpcEndpointServiceConfigurations
+                  - ec2:DeregisterImage
+                  - ec2:DescribeAddresses
+                  - ec2:DescribeIamInstanceProfileAssociations
+                  - ec2:DescribeImages
+                  - ec2:DescribeInstances
+                  - ec2:DescribeLaunchTemplates
+                  - ec2:DescribeLaunchTemplateVersions
+                  - ec2:DescribeNatGateways
+                  - ec2:DescribeNetworkInterfaces
+                  - ec2:DescribeRouteTables
+                  - ec2:DescribeSecurityGroups
+                  - ec2:DescribeSnapshots
+                  - ec2:DescribeSubnets
+                  - ec2:DescribeVolumes
+                  - ec2:DescribeVolumesModifications
+                  - ec2:DescribeVpcAttribute
+                  - ec2:DescribeVpcEndpoints
+                  - ec2:DescribeVpcEndpointServiceConfigurations
+                  - ec2:DescribeVpcs
+                  - ec2:DetachVolume
+                  - ec2:ModifySnapshotTier
+                  - ec2:ModifyVolume
+                  - ec2:ModifyVpcAttribute
+                  - ec2:ModifyVpcEndpoint
+                  - ec2:MonitorInstances
+                  - ec2:ReleaseAddress
+                  - ec2:RunInstances
+                  - ec2:StopInstances
+                  - ecs:DeregisterTaskDefinition
+                  - ecs:DescribeClusters
+                  - ecs:DescribeServices
+                  - ecs:DescribeTaskDefinition
+                  - ecs:DescribeTasks
+                  - ecs:ListServices
+                  - ecs:ListTasks
+                  - ecs:RegisterTaskDefinition
+                  - ecs:TagResource
+                  - ecs:UntagResource
+                  - ecs:UpdateService
+                  - elasticache:AddTagsToResource
+                  - elasticache:CreateCacheParameterGroup
+                  - elasticache:CreateReplicationGroup
+                  - elasticache:CreateSnapshot
+                  - elasticache:DecreaseReplicaCount
+                  - elasticache:DeleteCacheCluster
+                  - elasticache:DeleteReplicationGroup
+                  - elasticache:DescribeCacheClusters
+                  - elasticache:DescribeCacheParameterGroups
+                  - elasticache:DescribeCacheParameters
+                  - elasticache:DescribeReplicationGroups
+                  - elasticache:DescribeSnapshots
+                  - elasticache:ModifyCacheCluster
+                  - elasticache:ModifyCacheParameterGroup
+                  - elasticache:ModifyReplicationGroup
+                  - elasticfilesystem:CreateTags
+                  - elasticfilesystem:DescribeFileSystems
+                  - elasticfilesystem:DescribeLifecycleConfiguration
+                  - elasticfilesystem:PutLifecycleConfiguration
+                  - elasticfilesystem:TagResource
+                  - elasticfilesystem:UpdateFileSystem
+                  - elasticloadbalancing:DeleteListener
+                  - elasticloadbalancing:DeleteLoadBalancer
+                  - elasticloadbalancing:DeleteTargetGroup
+                  - elasticloadbalancing:DeregisterInstancesFromLoadBalancer
+                  - elasticloadbalancing:DescribeListeners
+                  - elasticloadbalancing:DescribeTargetGroups
+                  - elasticloadbalancing:ModifyLoadBalancerAttributes
+                  - es:AddTags
+                  - es:DescribeDomain
+                  - es:DescribeDomainChangeProgress
+                  - es:ListTags
+                  - es:UpdateDomainConfig
+                  - iam:AddRoleToInstanceProfile
+                  - iam:AttachRolePolicy
+                  - iam:CreateInstanceProfile
+                  - iam:CreateRole
+                  - iam:CreateServiceLinkedRole
+                  - iam:GetInstanceProfile
+                  - iam:GetRole
+                  - iam:ListInstanceProfilesForRole
+                  - iam:PassRole
+                  - iam:PutRolePolicy
+                  - kendra:CreateDataSource
+                  - kendra:CreateIndex
+                  - kendra:DeleteIndex
+                  - kinesis:DescribeAccountSettings
+                  - kinesis:UpdateAccountSettings
+                  - kms:DescribeKey
+                  - lambda:CreateFunction
+                  - lambda:DeleteFunction
+                  - lambda:DeleteFunctionConcurrency
+                  - lambda:DeleteProvisionedConcurrencyConfig
+                  - lambda:GetFunction
+                  - lambda:GetLayerVersion
+                  - lambda:InvokeFunction
+                  - lambda:PutFunctionConcurrency
+                  - lambda:PutProvisionedConcurrencyConfig
+                  - lambda:TagResource
+                  - lambda:UpdateFunctionCode
+                  - lambda:UpdateFunctionConfiguration
+                  - logs:PutRetentionPolicy
+                  - quicksight:DeleteUserByPrincipalId
+                  - quicksight:UpdateAnalysisPermissions
+                  - quicksight:UpdateDashboardPermissions
+                  - quicksight:UpdateDataSetPermissions
+                  - quicksight:UpdateDataSourcePermissions
+                  - rbin:CreateRule
+                  - rbin:DeleteRule
+                  - rbin:GetRule
+                  - rbin:ListRules
+                  - rds:AddTagsToResource
+                  - rds:CreateDBInstance
+                  - rds:CreateDBSnapshot
+                  - rds:DeleteDBCluster
+                  - rds:DeleteDBClusterSnapshot
+                  - rds:DeleteDBInstance
+                  - rds:DeleteDBSnapshot
+                  - rds:DescribeDBClusters
+                  - rds:DescribeDBClusterSnapshots
+                  - rds:DescribeDBInstances
+                  - rds:DescribeDBSnapshots
+                  - rds:FailoverDBCluster
+                  - rds:ListTagsForResource
+                  - rds:ModifyDBCluster
+                  - rds:ModifyDBInstance
+                  - rds:RemoveTagsFromResource
+                  - rds:RestoreDBClusterFromSnapshot
+                  - route53:AssociateVPCWithHostedZone
+                  - route53:GetChange
+                  - s3:CopyObject
+                  - s3:CreateBucket
+                  - s3:GetBucketTagging
+                  - s3:GetLifecycleConfiguration
+                  - s3:GetObject
+                  - s3:ListBucket
+                  - s3:PutBucketLifecycleConfiguration
+                  - s3:PutBucketPolicy
+                  - s3:PutBucketTagging
+                  - s3:PutInventoryConfiguration
+                  - s3:PutLifecycleConfiguration
+                  - s3:PutObject
+                  - sagemaker:AddTags
+                  - sagemaker:CreateNotebookInstanceLifecycleConfig
+                  - sagemaker:DescribeNotebookInstance
+                  - sagemaker:ListNotebookInstanceLifecycleConfigs
+                  - sagemaker:StartNotebookInstance
+                  - sagemaker:StopNotebookInstance
+                  - sagemaker:UpdateNotebookInstance
+                  - savingsplans:CreateSavingsPlan
+                  - savingsplans:DescribeSavingsPlans
+                  - secretsmanager:GetSecretValue
+                  - secretsmanager:ListSecrets
+                  - sns:Publish
+                  - ssm:CreateAssociation
+                  - ssm:CreateDocument
+                  - ssm:DeleteAssociation
+                  - ssm:DescribeDocument
+                  - ssm:GetAutomationExecution
+                  - ssm:ListCommandInvocations
+                  - ssm:PutParameter
+                  - ssm:SendCommand
+                  - ssm:StartAutomationExecution
+                  - ssm:UpdateAssociation
+                  - tag:TagResources
+                Effect: Allow
+                Resource: '*'
             Version: 2012-10-17
           PolicyName: core
+        - PolicyDocument:
+            Statement:
+              - Sid: SSMWriteLogs
+                Action:
+                  - 'logs:CreateLogGroup'
+                  - 'logs:CreateLogStream'
+                  - 'logs:DescribeLogGroups'
+                  - 'logs:DescribeLogStreams'
+                  - 'logs:PutLogEvents'
+                Effect: Allow
+                Resource: '*'
+            Version: 2012-10-17
+          PolicyName: SSM-Write-Logs
       RoleName: !Join
         - ''
         - - cloudfix-ssm-assumed-role
@@ -218,7 +659,6 @@ Resources:
                   - ':iam::'
                   - !Ref 'AWS::AccountId'
                   - ':root'
-
         Version: 2012-10-17
       RoleName: !Join
         - ''
@@ -293,7 +733,6 @@ Resources:
                   - 'ssm:DescribeDocument'
                   - 'ssm:ListDocumentVersions'
                   - 'ssm:StartChangeRequestExecution'
-                  - 'ssm:DeleteDocument'
                   - 'ssm:ListDocuments'
                   - 'ssm:UpdateDocumentDefaultVersion'
                   - 'ssm:GetAutomationExecution'
@@ -306,16 +745,16 @@ Resources:
                   - 'ssm:SendAutomationSignal'
                   - 'ssm:DescribeAutomationStepExecutions'
                   - 'ssm:DescribeAutomationExecutions'
+                  - 'ssm:DescribeDocumentPermission'
+                  - 'ssm:ModifyDocumentPermission'
                   - 'ssm:AddTagsToResource'
                   - 'iam:ListRoles'
                   - 'iam:ListUsers'
                   - 'iam:ListGroups'
                   - 'iam:GetGroup'
-                  - 'iam:CreateServiceLinkedRole'
                   - 'ssm:GetOpsSummary'
                   - 'ssm:GetOpsMetadata'
                   - 'sns:CreateTopic'
-                  - 'sns:ConfirmSubscription'
                   - 'ssm:UpdateServiceSetting'
                   - 'ssm:GetServiceSetting'
                   - 'autoscaling:CreateOrUpdateTags'
@@ -329,12 +768,34 @@ Resources:
                   - 'elasticfilesystem:TagResource'
                   - 'es:AddTags'
                   - 's3:PutBucketTagging'
-                  - 's3:GetObject'
                   - 'tag:TagResources'
                 Effect: Allow
                 Resource: '*'
+              - Sid: SSMDeleteCloudFixDocuments
+                Action: 'ssm:DeleteDocument'
+                Effect: Allow
+                Resource:
+                  - !Join ['', ['arn:', !Ref 'AWS::Partition', ':ssm:*:*:document/Cloudfix-*']]
+              - Sid: IAMCreateSSMServiceLinkedRole
+                Action: 'iam:CreateServiceLinkedRole'
+                Effect: Allow
+                Resource: !Join ['', ['arn:', !Ref 'AWS::Partition', ':iam::*:role/aws-service-role/ssm.amazonaws.com/*']]
+                Condition:
+                  StringEquals:
+                    'iam:AWSServiceName': 'ssm.amazonaws.com'
+              - Sid: SNSConfirmCloudFixSubscription
+                Action: 'sns:ConfirmSubscription'
+                Effect: Allow
+                Resource: !Join ['', ['arn:', !Ref 'AWS::Partition', ':sns:*:*:Cloudfix-*']]
             Version: 2012-10-17
           PolicyName: core
+        - PolicyDocument:
+            Statement:
+              - Action: 's3:GetObject'
+                Effect: Allow
+                Resource: !Join ['', ['arn:', !Ref 'AWS::Partition', ':s3:::', 'cloudfix-runbook-bucket-zip', !Ref ResourceSuffix, '/*']]
+            Version: 2012-10-17
+          PolicyName: specific-fixers
       RoleName: !Join
         - ''
         - - cloudfix-ssm-update-role

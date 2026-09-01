@@ -145,7 +145,7 @@
       <!-- How It Works -->
       <div class="section">
         <h2>How CloudFix Works</h2>
-        <p>CloudFix connects to your AWS account through a CloudFormation StackSet that creates carefully scoped IAM roles. Discovery runs through a read-oriented finder role whose only write permissions are resource tagging, CloudWatch Logs, Athena queries, and SNS notifications. No change is made to your infrastructure without your explicit approval of a change template, executed through AWS Systems Manager Change Manager and Automation runbooks inside your own account.</p>
+        <p>CloudFix connects to your AWS account through a CloudFormation StackSet that creates carefully scoped IAM roles. Discovery runs through a read-oriented finder role whose write permissions are limited to resource tagging, query execution, and a small number of finder-specific actions granted only when the finder that needs them is entitled. No change is made to your infrastructure without your explicit approval of a change template, executed as AWS Systems Manager Automation runbooks inside your own account.</p>
 
         <div class="callout callout-success" style="margin-top:16px;">
           <strong>Key principle:</strong> The role that executes fixes (<code>cloudfix-ssm-assumed-role</code>) is created by CloudFix but <strong>cannot be assumed or accessed by CloudFix</strong> — it is invoked only by AWS Systems Manager inside your account. In the default deployment the approver role trusts your account alone, so approval is the control boundary and it stays with you.
