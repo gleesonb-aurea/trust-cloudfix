@@ -10,3 +10,19 @@ private/
 !.dev.vars.example
 .env*
 !.env.example
+
+# ── Customer material — NEVER publish. ──
+# Contracts, SOWs, MSAs, pricing, statements, tenant data and anything else
+# naming a customer stays out of this repo. The repo root is served publicly
+# (see the note above), so committing it here publishes it.
+temp-sorenson/
+*-sorenson*/
+contracts/
+customers/
+tenants/
+*_MSA*
+*_SOW*
+*MSA_*
+*SOW_*
+*DRAFT.docx
+*.xlsx
