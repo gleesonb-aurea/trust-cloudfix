@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Trust Center — CloudFix</title>
-  <meta name="description" content="CloudFix solution architecture diagrams — standalone and ITSM / service desk integration.">
+  <meta name="description" content="CloudFix and RightSpend solution architecture diagrams — core architecture, ITSM / service desk integration, and the RightSpend optimisation loop.">
   <link rel="icon" type="image/png" href="assets/cloudfix-logo.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -122,7 +122,7 @@
 
       <div class="page-header">
         <h1>Architecture Diagrams</h1>
-        <p class="subtitle">Solution architecture and data flow for enterprise security reviews.</p>
+        <p class="subtitle">Solution architecture and data flow for CloudFix and RightSpend, for enterprise security reviews.</p>
         <p class="last-updated" data-last-updated></p>
       </div>
 
@@ -514,6 +514,278 @@
 
         <div class="callout callout-info" style="margin-top:20px;">
           <strong>No customer AWS data passes through the service desk platform.</strong> Webhook payloads contain only CloudFix recommendation metadata: AWS resource IDs, estimated savings amounts, service type, and approval status. No S3 contents, database records, application data, or credentials are ever included.
+        </div>
+      </div>
+
+      <!-- Diagram 3: RightSpend core architecture -->
+      <div class="section" id="rightspend">
+        <h2>RightSpend — Core Architecture</h2>
+        <p>How CloudFix RightSpend connects to your AWS Organization, what it reads, and the narrow boundary within which it writes. RightSpend is a separate product from CloudFix, with its own IAM roles, its own platform stack, and no shared permissions.</p>
+
+        <div class="diagram-wrap">
+          <!-- 900 × 570 viewport -->
+          <svg viewBox="0 0 900 570" xmlns="http://www.w3.org/2000/svg" font-family="Inter, sans-serif" font-size="12">
+            <defs>
+              <marker id="a3b" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                <path d="M0,0 L0,6 L8,3 z" fill="#1B3A5C"/>
+              </marker>
+              <marker id="a3g" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                <path d="M0,0 L0,6 L8,3 z" fill="#28A745"/>
+              </marker>
+              <marker id="a3r" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                <path d="M0,0 L0,6 L8,3 z" fill="#868E96"/>
+              </marker>
+            </defs>
+
+            <!-- ── Zone: RightSpend Platform (left) ── -->
+            <rect x="10" y="10" width="250" height="540" rx="10" fill="#EBF2FA" stroke="#2A5F8F" stroke-width="1.5"/>
+            <text x="135" y="32" text-anchor="middle" font-weight="700" font-size="13" fill="#0B1F3F">RightSpend Platform</text>
+            <text x="135" y="47" text-anchor="middle" font-size="11" fill="#2A5F8F">CloudFix AWS account · us-east-1</text>
+
+            <!-- EventBridge -->
+            <rect x="30" y="60" width="210" height="48" rx="7" fill="#fff" stroke="#2A5F8F" stroke-width="1"/>
+            <text x="135" y="81" text-anchor="middle" font-weight="600" fill="#0B1F3F" font-size="11">EventBridge Schedules</text>
+            <text x="135" y="96" text-anchor="middle" fill="#495057" font-size="10">Hourly loop · daily seed / prices / reports</text>
+
+            <!-- Step Functions -->
+            <rect x="30" y="124" width="210" height="52" rx="7" fill="#1B3A5C"/>
+            <text x="135" y="145" text-anchor="middle" font-weight="600" fill="#fff" font-size="11">Step Functions — Main Loop</text>
+            <text x="135" y="161" text-anchor="middle" fill="#93B8D8" font-size="9">Collect → Merge → Solve → Choose → Execute</text>
+
+            <!-- Lambda / Solver -->
+            <rect x="30" y="192" width="101" height="56" rx="7" fill="#fff" stroke="#2A5F8F" stroke-width="1"/>
+            <text x="80" y="213" text-anchor="middle" font-weight="600" fill="#0B1F3F" font-size="11">Lambda</text>
+            <text x="80" y="227" text-anchor="middle" fill="#495057" font-size="10">Python 3.12</text>
+            <text x="80" y="240" text-anchor="middle" fill="#495057" font-size="10">arm64</text>
+
+            <rect x="139" y="192" width="101" height="56" rx="7" fill="#fff" stroke="#2A5F8F" stroke-width="1"/>
+            <text x="189" y="213" text-anchor="middle" font-weight="600" fill="#0B1F3F" font-size="11">Solver Lambda</text>
+            <text x="189" y="227" text-anchor="middle" fill="#495057" font-size="10">OR-Tools / SCIP</text>
+            <text x="189" y="240" text-anchor="middle" fill="#495057" font-size="10">linear optimisation</text>
+
+            <!-- S3 / DynamoDB -->
+            <rect x="30" y="264" width="101" height="56" rx="7" fill="#fff" stroke="#CED4DA" stroke-width="1"/>
+            <text x="80" y="285" text-anchor="middle" font-weight="600" fill="#0B1F3F" font-size="11">S3</text>
+            <text x="80" y="299" text-anchor="middle" fill="#495057" font-size="10">Usage snapshots</text>
+            <text x="80" y="312" text-anchor="middle" fill="#495057" font-size="10">Pricing data</text>
+
+            <rect x="139" y="264" width="101" height="56" rx="7" fill="#fff" stroke="#CED4DA" stroke-width="1"/>
+            <text x="189" y="285" text-anchor="middle" font-weight="600" fill="#0B1F3F" font-size="11">DynamoDB</text>
+            <text x="189" y="299" text-anchor="middle" fill="#495057" font-size="10">Operation state</text>
+            <text x="189" y="312" text-anchor="middle" fill="#495057" font-size="10">cRI tracking</text>
+
+            <!-- Secrets Manager -->
+            <rect x="30" y="336" width="210" height="48" rx="7" fill="#fff" stroke="#2A5F8F" stroke-width="1"/>
+            <text x="135" y="357" text-anchor="middle" font-weight="600" fill="#0B1F3F" font-size="11">AWS Secrets Manager</text>
+            <text x="135" y="372" text-anchor="middle" fill="#495057" font-size="10">External IDs · no customer credentials stored</text>
+
+            <!-- AWS Pricing API -->
+            <rect x="30" y="400" width="210" height="48" rx="7" fill="#fff" stroke="#CED4DA" stroke-width="1" stroke-dasharray="5,3"/>
+            <text x="135" y="421" text-anchor="middle" font-weight="600" fill="#0B1F3F" font-size="11">AWS Pricing API</text>
+            <text x="135" y="436" text-anchor="middle" fill="#868E96" font-size="10">Public rate card · no customer data</text>
+
+            <!-- Marketplace metering -->
+            <rect x="30" y="464" width="210" height="48" rx="7" fill="#fff" stroke="#CED4DA" stroke-width="1" stroke-dasharray="5,3"/>
+            <text x="135" y="485" text-anchor="middle" font-weight="600" fill="#0B1F3F" font-size="11">AWS Marketplace Metering</text>
+            <text x="135" y="500" text-anchor="middle" fill="#868E96" font-size="10">Daily record · fee on realised savings</text>
+
+            <!-- ── Zone: Customer AWS Organization (right) ── -->
+            <rect x="290" y="10" width="600" height="540" rx="10" fill="#EDFAF1" stroke="#28A745" stroke-width="1.5"/>
+            <text x="590" y="32" text-anchor="middle" font-weight="700" font-size="13" fill="#155724">Customer AWS Organization</text>
+            <text x="590" y="47" text-anchor="middle" font-size="11" fill="#28A745">Roles deployed via CloudFormation StackSet · every API call logged in your CloudTrail</text>
+
+            <!-- Sub-zone: Management account -->
+            <rect x="305" y="60" width="570" height="112" rx="8" fill="#fff" stroke="#28A745" stroke-width="1" stroke-dasharray="4,3"/>
+            <text x="318" y="78" font-weight="700" font-size="11" fill="#155724">Management (payer) account</text>
+
+            <rect x="318" y="88" width="300" height="72" rx="7" fill="#F8FCF9" stroke="#28A745" stroke-width="1"/>
+            <text x="468" y="107" text-anchor="middle" font-weight="600" fill="#155724" font-size="11">CloudFix-RightSpend-ReadOnly-Master-Role</text>
+            <text x="468" y="123" text-anchor="middle" fill="#495057" font-size="10">organizations:ListAccounts · ListRoots</text>
+            <text x="468" y="137" text-anchor="middle" fill="#495057" font-size="10">ce:Get* — coverage, utilisation, usage</text>
+            <text x="468" y="151" text-anchor="middle" fill="#868E96" font-size="10">cloudformation: scoped to RightSpend StackSets</text>
+
+            <rect x="638" y="88" width="224" height="72" rx="7" fill="#fff" stroke="#CED4DA" stroke-width="1"/>
+            <text x="750" y="110" text-anchor="middle" font-weight="600" fill="#0B1F3F" font-size="11">Cost Explorer · Organizations</text>
+            <text x="750" y="126" text-anchor="middle" fill="#495057" font-size="10">Aggregate historical usage</text>
+            <text x="750" y="140" text-anchor="middle" fill="#495057" font-size="10">Account list for collection</text>
+            <text x="750" y="154" text-anchor="middle" fill="#28A745" font-size="10" font-weight="600">Read only</text>
+
+            <!-- Sub-zone: Member accounts -->
+            <rect x="305" y="186" width="570" height="112" rx="8" fill="#fff" stroke="#28A745" stroke-width="1" stroke-dasharray="4,3"/>
+            <text x="318" y="204" font-weight="700" font-size="11" fill="#155724">All member accounts</text>
+
+            <rect x="318" y="214" width="300" height="72" rx="7" fill="#F8FCF9" stroke="#28A745" stroke-width="1"/>
+            <text x="468" y="233" text-anchor="middle" font-weight="600" fill="#155724" font-size="11">CloudFix-RightSpend-ReadOnly-Role</text>
+            <text x="468" y="249" text-anchor="middle" fill="#495057" font-size="10">ec2:Describe — instances, hosts, regions,</text>
+            <text x="468" y="263" text-anchor="middle" fill="#495057" font-size="10">capacity reservations, reserved instances</text>
+            <text x="468" y="277" text-anchor="middle" fill="#495057" font-size="10">savingsplans:DescribeSavingsPlans</text>
+
+            <rect x="638" y="214" width="224" height="72" rx="7" fill="#fff" stroke="#CED4DA" stroke-width="1"/>
+            <text x="750" y="236" text-anchor="middle" font-weight="600" fill="#0B1F3F" font-size="11">EC2 · Hosts · Capacity</text>
+            <text x="750" y="252" text-anchor="middle" fill="#495057" font-size="10">Resource metadata only</text>
+            <text x="750" y="266" text-anchor="middle" fill="#868E96" font-size="10">No instance, volume or</text>
+            <text x="750" y="280" text-anchor="middle" fill="#868E96" font-size="10">application data accessed</text>
+
+            <!-- Write boundary -->
+            <rect x="305" y="312" width="570" height="18" rx="4" fill="#FFF3CD"/>
+            <text x="590" y="325" text-anchor="middle" font-size="10" fill="#856404" font-weight="600">── Write access exists only below this line: Reserved Instance APIs, in designated cRI accounts only ──</text>
+
+            <!-- Sub-zone: cRI accounts -->
+            <rect x="305" y="344" width="570" height="128" rx="8" fill="#fff" stroke="#28A745" stroke-width="1" stroke-dasharray="4,3"/>
+            <text x="318" y="362" font-weight="700" font-size="11" fill="#155724">Designated cRI account(s)</text>
+
+            <rect x="318" y="372" width="300" height="88" rx="7" fill="#F8FCF9" stroke="#28A745" stroke-width="1.5"/>
+            <text x="468" y="391" text-anchor="middle" font-weight="600" fill="#155724" font-size="11">CloudFix-RightSpend-Write-Role</text>
+            <text x="468" y="407" text-anchor="middle" fill="#495057" font-size="10">ec2: purchase · modify · exchange</text>
+            <text x="468" y="421" text-anchor="middle" fill="#495057" font-size="10">Reserved Instances only</text>
+            <text x="468" y="437" text-anchor="middle" fill="#868E96" font-size="10">Assumed under sts:ExternalId condition</text>
+            <text x="468" y="451" text-anchor="middle" fill="#868E96" font-size="10">= your management account ID</text>
+
+            <rect x="638" y="372" width="224" height="88" rx="7" fill="#fff" stroke="#CED4DA" stroke-width="1"/>
+            <text x="750" y="394" text-anchor="middle" font-weight="600" fill="#0B1F3F" font-size="11">Convertible Reserved</text>
+            <text x="750" y="408" text-anchor="middle" font-weight="600" fill="#0B1F3F" font-size="11">Instances (cRIs)</text>
+            <text x="750" y="426" text-anchor="middle" fill="#495057" font-size="10">Purchased, split, exchanged</text>
+            <text x="750" y="440" text-anchor="middle" fill="#28A745" font-size="10" font-weight="600">The only objects</text>
+            <text x="750" y="453" text-anchor="middle" fill="#28A745" font-size="10" font-weight="600">RightSpend modifies</text>
+
+            <!-- CloudTrail -->
+            <rect x="305" y="488" width="570" height="46" rx="7" fill="#fff" stroke="#CED4DA" stroke-width="1"/>
+            <text x="590" y="508" text-anchor="middle" font-weight="600" fill="#0B1F3F" font-size="11">CloudTrail</text>
+            <text x="590" y="524" text-anchor="middle" fill="#495057" font-size="10">Every RightSpend API call is logged in your own account, attributed to the assuming role</text>
+
+            <!-- ── Arrows ── -->
+            <!-- Platform → Master role -->
+            <line x1="260" y1="124" x2="316" y2="124" stroke="#1B3A5C" stroke-width="1.5" marker-end="url(#a3b)"/>
+            <text x="288" y="117" text-anchor="middle" fill="#1B3A5C" font-size="10">Read</text>
+
+            <!-- Platform → Member role -->
+            <path d="M260,150 C285,150 290,190 316,250" stroke="#1B3A5C" stroke-width="1.5" fill="none" marker-end="url(#a3b)"/>
+            <text x="284" y="212" text-anchor="middle" fill="#1B3A5C" font-size="10">Read</text>
+
+            <!-- Platform → Write role -->
+            <path d="M260,176 C288,300 280,380 316,416" stroke="#28A745" stroke-width="1.8" fill="none" marker-end="url(#a3g)"/>
+            <text x="276" y="360" text-anchor="middle" fill="#28A745" font-size="10">Write</text>
+
+            <!-- Master role → CE -->
+            <line x1="618" y1="124" x2="636" y2="124" stroke="#1B3A5C" stroke-width="1.2" marker-end="url(#a3b)"/>
+            <!-- Member role → EC2 -->
+            <line x1="618" y1="250" x2="636" y2="250" stroke="#1B3A5C" stroke-width="1.2" marker-end="url(#a3b)"/>
+            <!-- Write role → cRIs -->
+            <line x1="618" y1="416" x2="636" y2="416" stroke="#28A745" stroke-width="1.8" marker-end="url(#a3g)"/>
+
+            <!-- Usage snapshot back to S3 -->
+            <path d="M316,280 C292,280 272,280 261,292" stroke="#868E96" stroke-width="1.2" fill="none" stroke-dasharray="4,2" marker-end="url(#a3r)"/>
+            <text x="275" y="269" text-anchor="middle" fill="#868E96" font-size="9">Usage</text>
+            <text x="275" y="279" text-anchor="middle" fill="#868E96" font-size="9">data</text>
+
+          </svg>
+          <p class="diagram-caption">Figure 3 — RightSpend core architecture. Three separate IAM roles serve three distinct access patterns, and each is deployed only where it is needed. Read access spans the Organization; write access is confined to Reserved Instance APIs in the designated cRI accounts.</p>
+          <div class="diagram-legend">
+            <div class="legend-item"><div class="legend-swatch" style="background:#EBF2FA;border:1.5px solid #2A5F8F;"></div> RightSpend Platform (CloudFix AWS account)</div>
+            <div class="legend-item"><div class="legend-swatch" style="background:#EDFAF1;border:1.5px solid #28A745;"></div> Customer AWS Organization</div>
+            <div class="legend-item"><div class="legend-swatch" style="background:#FFF3CD;border:1px solid #FFC107;"></div> Write boundary — Reserved Instance APIs only</div>
+          </div>
+          <div class="callout" style="margin-top:20px;">
+            <strong>What RightSpend never has.</strong> RightSpend has no write access to EC2 instances, EBS volumes, S3 buckets, databases, or any other AWS resource — the only objects it can modify are Reserved Instances, and only in the accounts you designate for that purpose. It reads resource <em>metadata</em> and Cost Explorer <em>aggregates</em>; it does not read the contents of any customer workload or data store. Full action lists per role and the published CloudFormation templates are on the <a href="rightspend.html#permissions">RightSpend</a> page.
+          </div>
+        </div>
+      </div>
+
+      <!-- Diagram 4: RightSpend optimisation loop -->
+      <div class="section" id="rightspend-loop">
+        <h2>RightSpend — Hourly Optimisation Loop</h2>
+        <p>RightSpend runs a closed loop once an hour. Every stage before <code>Execute</code> is read-only; <code>Execute</code> is the single stage that calls a write API, and it can only act on Reserved Instances.</p>
+
+        <div class="diagram-wrap">
+          <!-- 904 × 230 viewport -->
+          <svg viewBox="0 0 904 230" xmlns="http://www.w3.org/2000/svg" font-family="Inter, sans-serif" font-size="12">
+            <defs>
+              <marker id="a4b" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                <path d="M0,0 L0,6 L8,3 z" fill="#1B3A5C"/>
+              </marker>
+              <marker id="a4g" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                <path d="M0,0 L0,6 L8,3 z" fill="#28A745"/>
+              </marker>
+            </defs>
+
+            <!-- Read-only band -->
+            <rect x="6" y="34" width="778" height="104" rx="8" fill="#EBF2FA" stroke="#2A5F8F" stroke-width="1" stroke-dasharray="5,3"/>
+            <text x="395" y="28" text-anchor="middle" font-size="11" font-weight="600" fill="#2A5F8F">Read-only stages</text>
+
+            <!-- Write band -->
+            <rect x="792" y="34" width="106" height="104" rx="8" fill="#EDFAF1" stroke="#28A745" stroke-width="1.5"/>
+            <text x="845" y="28" text-anchor="middle" font-size="11" font-weight="600" fill="#155724">Write stage</text>
+
+            <!-- 1 EventBridge -->
+            <rect x="18" y="52" width="100" height="68" rx="7" fill="#1B3A5C"/>
+            <text x="68" y="76" text-anchor="middle" font-weight="600" fill="#fff" font-size="11">EventBridge</text>
+            <text x="68" y="92" text-anchor="middle" fill="#93B8D8" font-size="10">Hourly</text>
+            <text x="68" y="105" text-anchor="middle" fill="#93B8D8" font-size="10">trigger</text>
+
+            <!-- 2 Check -->
+            <rect x="128" y="52" width="100" height="68" rx="7" fill="#fff" stroke="#2A5F8F" stroke-width="1"/>
+            <text x="178" y="76" text-anchor="middle" font-weight="600" fill="#0B1F3F" font-size="11">Check</text>
+            <text x="178" y="92" text-anchor="middle" fill="#495057" font-size="10">No overlapping</text>
+            <text x="178" y="105" text-anchor="middle" fill="#495057" font-size="10">run in flight</text>
+
+            <!-- 3 GetCreds -->
+            <rect x="238" y="52" width="100" height="68" rx="7" fill="#fff" stroke="#2A5F8F" stroke-width="1"/>
+            <text x="288" y="76" text-anchor="middle" font-weight="600" fill="#0B1F3F" font-size="11">Get Creds</text>
+            <text x="288" y="92" text-anchor="middle" fill="#495057" font-size="10">AssumeRole,</text>
+            <text x="288" y="105" text-anchor="middle" fill="#495057" font-size="10">short-lived STS</text>
+
+            <!-- 4 Collect -->
+            <rect x="348" y="52" width="100" height="68" rx="7" fill="#fff" stroke="#2A5F8F" stroke-width="1"/>
+            <text x="398" y="76" text-anchor="middle" font-weight="600" fill="#0B1F3F" font-size="11">Collect</text>
+            <text x="398" y="92" text-anchor="middle" fill="#495057" font-size="10">Parallel per</text>
+            <text x="398" y="105" text-anchor="middle" fill="#495057" font-size="10">account · region</text>
+
+            <!-- 5 Merge -->
+            <rect x="458" y="52" width="100" height="68" rx="7" fill="#fff" stroke="#2A5F8F" stroke-width="1"/>
+            <text x="508" y="76" text-anchor="middle" font-weight="600" fill="#0B1F3F" font-size="11">Merge</text>
+            <text x="508" y="92" text-anchor="middle" fill="#495057" font-size="10">Usage snapshot</text>
+            <text x="508" y="105" text-anchor="middle" fill="#495057" font-size="10">written to S3</text>
+
+            <!-- 6 Solve -->
+            <rect x="568" y="52" width="100" height="68" rx="7" fill="#fff" stroke="#2A5F8F" stroke-width="1"/>
+            <text x="618" y="76" text-anchor="middle" font-weight="600" fill="#0B1F3F" font-size="11">Solve</text>
+            <text x="618" y="92" text-anchor="middle" fill="#495057" font-size="10">OR-Tools ILP</text>
+            <text x="618" y="105" text-anchor="middle" fill="#495057" font-size="10">no AWS calls</text>
+
+            <!-- 7 Choose -->
+            <rect x="678" y="52" width="100" height="68" rx="7" fill="#fff" stroke="#2A5F8F" stroke-width="1"/>
+            <text x="728" y="76" text-anchor="middle" font-weight="600" fill="#0B1F3F" font-size="11">Choose</text>
+            <text x="728" y="92" text-anchor="middle" fill="#495057" font-size="10">Rank options</text>
+            <text x="728" y="105" text-anchor="middle" fill="#495057" font-size="10">apply limits</text>
+
+            <!-- 8 Execute -->
+            <rect x="800" y="52" width="90" height="68" rx="7" fill="#155724"/>
+            <text x="845" y="76" text-anchor="middle" font-weight="600" fill="#fff" font-size="11">Execute</text>
+            <text x="845" y="92" text-anchor="middle" fill="#B7E4C7" font-size="10">Modify /</text>
+            <text x="845" y="105" text-anchor="middle" fill="#B7E4C7" font-size="10">exchange cRIs</text>
+
+            <!-- connectors -->
+            <line x1="118" y1="86" x2="126" y2="86" stroke="#1B3A5C" stroke-width="1.4" marker-end="url(#a4b)"/>
+            <line x1="228" y1="86" x2="236" y2="86" stroke="#1B3A5C" stroke-width="1.4" marker-end="url(#a4b)"/>
+            <line x1="338" y1="86" x2="346" y2="86" stroke="#1B3A5C" stroke-width="1.4" marker-end="url(#a4b)"/>
+            <line x1="448" y1="86" x2="456" y2="86" stroke="#1B3A5C" stroke-width="1.4" marker-end="url(#a4b)"/>
+            <line x1="558" y1="86" x2="566" y2="86" stroke="#1B3A5C" stroke-width="1.4" marker-end="url(#a4b)"/>
+            <line x1="668" y1="86" x2="676" y2="86" stroke="#1B3A5C" stroke-width="1.4" marker-end="url(#a4b)"/>
+            <line x1="778" y1="86" x2="798" y2="86" stroke="#28A745" stroke-width="1.8" marker-end="url(#a4g)"/>
+
+            <!-- poll loop under Execute -->
+            <path d="M812,120 C800,168 890,168 878,120" stroke="#28A745" stroke-width="1.4" fill="none" marker-end="url(#a4g)"/>
+            <text x="845" y="186" text-anchor="middle" fill="#28A745" font-size="10">Poll until AWS</text>
+            <text x="845" y="198" text-anchor="middle" fill="#28A745" font-size="10">confirms the exchange</text>
+
+            <!-- read-only note -->
+            <text x="395" y="160" text-anchor="middle" fill="#868E96" font-size="10">No customer resource is modified at any stage in this band. Credentials are short-lived STS sessions obtained per run — nothing long-lived is stored.</text>
+          </svg>
+          <p class="diagram-caption">Figure 4 — RightSpend hourly optimisation loop, as orchestrated by AWS Step Functions. Seeding, pricing refresh, reporting and AWS Marketplace metering run on their own daily schedules outside this loop.</p>
+          <div class="diagram-legend">
+            <div class="legend-item"><div class="legend-swatch" style="background:#EBF2FA;border:1px solid #2A5F8F;"></div> Read-only stages</div>
+            <div class="legend-item"><div class="legend-swatch" style="background:#EDFAF1;border:1.5px solid #28A745;"></div> Write stage — Reserved Instance APIs only</div>
+          </div>
         </div>
       </div>
 
